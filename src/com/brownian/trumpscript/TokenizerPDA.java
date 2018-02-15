@@ -9,7 +9,11 @@ import java.io.Reader;
 
 public class TokenizerPDA {
 
+    private final SymbolTable symbolTable;
     private PushbackReader characterSource;
+    private char peek;
+    private TokenizerPDAState currentState;
+    private StringBuilder tokenBuilder;
 
     /**
      * @see Reader#read() The value returned when read()ing from the end of the file.
@@ -17,70 +21,119 @@ public class TokenizerPDA {
     private final static int EOF = -1;
 
     //TODO: incorporate symbol table and error handler
-    public TokenizerPDA(Reader characterSource) {
+    public TokenizerPDA(Reader characterSource, SymbolTable symbolTable) {
         this.characterSource = new PushbackReader(characterSource);
+        this.symbolTable = symbolTable;
     }
 
     public Token getNextToken() throws IOException {
-        StringBuilder tokenBuilder = new StringBuilder();
-        char currentCharacter;
-        TokenizerPDAState currentState = TokenizerPDAState.INITIAL_STATE;
+        tokenBuilder = new StringBuilder();
+        currentState = TokenizerPDAState.INITIAL_STATE;
         while (true) {
             switch (currentState) {
                 case INITIAL_STATE:
-                    switch (currentCharacter = getChar()) {
+                    switch (peek = getChar()) {
                         case 'm':
                         case 'M':
-                            tokenBuilder.append(currentCharacter);
+                            tokenBuilder.append(peek);
                             currentState = TokenizerPDAState.KEYWORD_M_;
                             break;
                         case 'p':
                         case 'P':
-                            tokenBuilder.append(currentCharacter);
+                            tokenBuilder.append(peek);
                             currentState = TokenizerPDAState.KEYWORD_P_;
                             break;
                         case 'g':
                         case 'G':
-                            tokenBuilder.append(currentCharacter);
+                            tokenBuilder.append(peek);
                             currentState = TokenizerPDAState.KEYWORD_G_;
                             break;
                         case 'a':
                         case 'A':
-                            tokenBuilder.append(currentCharacter);
+                            tokenBuilder.append(peek);
                             currentState = TokenizerPDAState.KEYWORD_A_;
                             break;
                         case '"':
-                            tokenBuilder.append(currentCharacter);
+                            tokenBuilder.append(peek);
                             currentState = TokenizerPDAState.STRING_LITERAL_INCOMPLETE;
                             break;
                         default:
-                            if (Character.isWhitespace(currentCharacter)) {
+                            if (Character.isWhitespace(peek)) {
                                 break;
-                            } else if (Character.isAlphabetic(currentCharacter)) {
-                                tokenBuilder.append(currentCharacter);
+                            } else if (Character.isAlphabetic(peek)) {
+                                tokenBuilder.append(peek);
                                 currentState = TokenizerPDAState.ID;
                                 break;
-                            } else if (Character.isDigit(currentCharacter)) {
-                                tokenBuilder.append(currentCharacter);
+                            } else if (Character.isDigit(peek)) {
+                                tokenBuilder.append(peek);
                                 currentState = TokenizerPDAState.CONST_DIGIT_1;
                                 break;
-                            } else if (isSpecialCharacter(currentCharacter)) {
-                                tokenBuilder.append(currentCharacter);
+                            } else if (isSpecialCharacter(peek)) {
+                                tokenBuilder.append(peek);
                                 currentState = TokenizerPDAState.EMIT_SPECIAL_CHARACTER;
                                 break;
                             } else {
-                                tokenBuilder.append(currentCharacter);
+                                tokenBuilder.append(peek);
                                 currentState = TokenizerPDAState.ERR_ID;
                                 break;
                             }
                     }
 
                 case ID:
-
-                    break;
+                    peek = getChar();
+                    if (Character.isLetterOrDigit(peek)) {
+                        tokenBuilder.append(peek);
+                        break;
+                    } else if (Character.isWhitespace(peek)) {
+                        currentState = TokenizerPDAState.EMIT_ID;
+                        break;
+                    } else if (isSpecialCharacter(peek)) {
+                        ungetChar(peek);
+                        currentState = TokenizerPDAState.EMIT_ID;
+                        break;
+                    } else {
+                        tokenBuilder.append(peek);
+                        currentState = TokenizerPDAState.ERR_ID;
+                        break;
+                    }
                 case KEYWORD_M_:
+                    peek = getChar();
+                    if (peek == 'a') {
+                        tokenBuilder.append(peek);
+                        currentState = TokenizerPDAState.KEYWORD_MA_;
+                    } else if (peek == 'o') {
+                        tokenBuilder.append(peek);
+                        currentState = TokenizerPDAState.KEYWORD_MO_;
+                    } else if (Character.isLetterOrDigit(peek)) {
+                        tokenBuilder.append(peek);
+                        currentState = TokenizerPDAState.ID;
+                    } else if (Character.isWhitespace(peek)) {
+                        currentState = TokenizerPDAState.EMIT_ID;
+                    } else if (isSpecialCharacter(peek)) {
+                        ungetChar(peek);
+                        currentState = TokenizerPDAState.EMIT_ID;
+                    } else {
+                        tokenBuilder.append(peek);
+                        currentState = TokenizerPDAState.ERR_ID;
+                    }
                     break;
                 case KEYWORD_MA_:
+                    peek = getChar();
+                    if (peek == 'k') {
+                        tokenBuilder.append(peek);
+                        currentState = TokenizerPDAState.KEYWORD_MAK_;
+                    } else if (Character.isLetterOrDigit(peek)) {
+                        tokenBuilder.append(peek);
+                        currentState = TokenizerPDAState.ID;
+                    } else if (Character.isWhitespace(peek)) {
+                        currentState = TokenizerPDAState.EMIT_ID;
+                    } else if (isSpecialCharacter(peek)) {
+                        ungetChar(peek);
+                        currentState = TokenizerPDAState.EMIT_ID;
+                    } else {
+                        tokenBuilder.append(peek);
+                        currentState = TokenizerPDAState.ERR_ID;
+                    }
                     break;
                 case KEYWORD_MAK_:
                     break;
@@ -157,77 +210,92 @@ public class TokenizerPDA {
                 case STRING_LITERAL_COMPLETE:
                     break;
                 case CONST_DIGIT_1:
-                    currentCharacter = getChar();
-                    tokenBuilder.append(currentCharacter);
-                    if(Character.isDigit(currentCharacter) && currentCharacter != '0'){
+                    peek = getChar();
+                    tokenBuilder.append(peek);
+                    if (Character.isDigit(peek) && peek != '0') {
                         currentState = TokenizerPDAState.CONST_DIGIT_2;
                     } else {
                         currentState = TokenizerPDAState.ERR_CONST;
                     }
                     break;
                 case CONST_DIGIT_2:
-                    currentCharacter = getChar();
-                    tokenBuilder.append(currentCharacter);
-                    if(Character.isDigit(currentCharacter)){
+                    peek = getChar();
+                    tokenBuilder.append(peek);
+                    if (Character.isDigit(peek)) {
                         currentState = TokenizerPDAState.CONST_DIGIT_3;
                     } else {
                         currentState = TokenizerPDAState.ERR_CONST;
                     }
                     break;
                 case CONST_DIGIT_3:
-                    currentCharacter = getChar();
-                    tokenBuilder.append(currentCharacter);
-                    if(Character.isDigit(currentCharacter)){
+                    peek = getChar();
+                    tokenBuilder.append(peek);
+                    if (Character.isDigit(peek)) {
                         currentState = TokenizerPDAState.CONST_DIGIT_4;
                     } else {
                         currentState = TokenizerPDAState.ERR_CONST;
                     }
                     break;
                 case CONST_DIGIT_4:
-                    currentCharacter = getChar();
-                    tokenBuilder.append(currentCharacter);
-                    if(Character.isDigit(currentCharacter)){
+                    peek = getChar();
+                    tokenBuilder.append(peek);
+                    if (Character.isDigit(peek)) {
                         currentState = TokenizerPDAState.CONST_DIGIT_5;
                     } else {
                         currentState = TokenizerPDAState.ERR_CONST;
                     }
                     break;
                 case CONST_DIGIT_5:
-                    currentCharacter = getChar();
-                    tokenBuilder.append(currentCharacter);
-                    if(Character.isDigit(currentCharacter)){
+                    peek = getChar();
+                    tokenBuilder.append(peek);
+                    if (Character.isDigit(peek)) {
                         currentState = TokenizerPDAState.CONST_DIGIT_6;
                     } else {
                         currentState = TokenizerPDAState.ERR_CONST;
                     }
                     break;
                 case CONST_DIGIT_6:
-                    currentCharacter = getChar();
-                    tokenBuilder.append(currentCharacter);
-                    if(Character.isDigit(currentCharacter)){
+                    peek = getChar();
+                    tokenBuilder.append(peek);
+                    if (Character.isDigit(peek)) {
                         currentState = TokenizerPDAState.CONST;
                     } else {
                         currentState = TokenizerPDAState.ERR_CONST;
                     }
                     break;
                 case CONST:
-                    currentCharacter = getChar();
-                    tokenBuilder.append(currentCharacter);
-                    if(Character.isDigit(currentCharacter)){
+                    peek = getChar();
+                    tokenBuilder.append(peek);
+                    if (Character.isDigit(peek)) {
                         currentState = TokenizerPDAState.CONST;
-                    } else if(isSpecialCharacter(currentCharacter) || Character.isWhitespace(currentCharacter)) {
-                        ungetChar(currentCharacter);
+                    } else if (isSpecialCharacter(peek) || Character.isWhitespace(peek)) {
+                        ungetChar(peek);
                         currentState = TokenizerPDAState.EMIT_CONST;
                     } else {
                         currentState = TokenizerPDAState.ERR_CONST;
                     }
                     break;
                 case EMIT_ID:
-                    return new IdToken(tokenBuilder.toString());
+                    Token idToken = symbolTable.lookupToken(tokenBuilder.toString());
+                    if(idToken == null) {
+                        idToken = new IdToken(tokenBuilder.toString());
+                        symbolTable.setToken(tokenBuilder.toString(), idToken);
+                    }
+                    return idToken;
                 case EMIT_CONST:
-                    return new IntegerConstantToken(Long.parseLong(tokenBuilder.toString()));
+                    Token constToken = symbolTable.lookupToken(tokenBuilder.toString());
+                    if(constToken == null) {
+                        constToken = new IntegerConstantToken(Long.parseLong(tokenBuilder.toString()));
+                        symbolTable.setToken(tokenBuilder.toString(), constToken);
+                    }
+                    return constToken;
                 case EMIT_STRING_LITERAL:
-                    return new StringLiteralToken(tokenBuilder.toString());
+                    Token stringLiteralToken = symbolTable.lookupToken(tokenBuilder.toString());
+                    if(stringLiteralToken == null){
+                        stringLiteralToken = new StringLiteralToken(tokenBuilder.toString());
+                        symbolTable.setToken(tokenBuilder.toString(), stringLiteralToken);
+                    }
+                    return stringLiteralToken;
                 case EMIT_SPECIAL_CHARACTER:
                     return new SpecialCharacterToken(tokenBuilder.charAt(0));
                 case EMIT_KEYWORD:
@@ -245,8 +313,8 @@ public class TokenizerPDA {
         }
     }
 
-    private boolean isSpecialCharacter(char character){
-        return character == '.' || character == '?' || character == '!' || character == ';'; //TODO: check this is complete
+    private boolean isSpecialCharacter(char character) {
+        return character == ',' ||  character == ';' ||  character == ':' ||character == '!' || character == '?' ||  character == '(' ||  character == ')';
     }
 
     private char getChar() throws IOException {
@@ -268,9 +336,26 @@ public class TokenizerPDA {
         KEYWORD_PROGRAMMING_,
         KEYWORD_G_, KEYWORD_GR_, KEYWORD_GRE_, KEYWORD_GREA_, KEYWORD_GREAT_,
         KEYWORD_A_, KEYWORD_AG_, KEYWORD_AGA_, KEYWORD_AGAI_, KEYWORD_AGAIN_,
-        KEYWORD_PL_, KEYWORD_PLU_, KEYWORD_PLUS_,
-        KEYWORD_MO_, KEYWORD_MOR_, KEYWORD_MORE_,
+        KEYWORD_AM_, KEYWORD_AME_, KEYWORD_AMER_, KEYWORD_AMERI_, KEYWORD_AMERIC_, KEYWORD_AMERICA_,
+        KEYWORD_I_, KEYWORD_IS_,
+        KEYWORD_E_, KEYWORD_EL_, KEYWORD_ELS_, KEYWORD_ELSE_,
         KEYWORD_N_, KEYWORD_NU_, KEYWORD_NUM_, KEYWORD_NUMB_, KEYWORD_NUMBE_, KEYWORD_NUMBER_,
+        KEYWORD_B_, KEYWORD_BO_, KEYWORD_BOO_, KEYWORD_BOOL_, KEYWORD_BOOLE_, KEYWORD_BOOLEA_,
+        KEYWORD_BOOLEAN_,
+        KEYWORD_IF_,
+        KEYWORD_AS_,
+        KEYWORD_L_, KEYWORD_LO_, KEYWORD_LON_, KEYWORD_LONG_,
+        KEYWORD_T_, KEYWORD_TE_, KEYWORD_TEL_, KEYWORD_TELL_,
+        KEYWORD_S_, KEYWORD_SA_, KEYWORD_SAY_,
+        KEYWORD_F_, KEYWORD_FA_, KEYWORD_FAC_, KEYWORD_FACT_,
+        KEYWORD_LI_, KEYWORD_LIE_,
+        KEYWORD_NO_, KEYWORD_NOT_,
+        KEYWORD_AN_, KEYWORD_AND_,
+        KEYWORD_O_, KEYWORD_OR_,
+        KEYWORD_LE_, KEYWORD_LES_, KEYWORD_LESS_,
+        KEYWORD_MO_, KEYWORD_MOR_, KEYWORD_MORE_,
+        KEYWORD_PL_, KEYWORD_PLU_, KEYWORD_PLUS_,
+        KEYWORD_TI_, KEYWORD_TIM_, KEYWORD_TIME_, KEYWORD_TIMES_,
 
         STRING_LITERAL_INCOMPLETE, STRING_LITERAL_COMPLETE,
 
