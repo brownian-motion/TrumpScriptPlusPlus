@@ -1,13 +1,13 @@
 package com.brownian.trumpscript.token;
 
 public abstract class Token {
-    private String text;
+    private String lexeme;
 
-    protected Token(String text) {
-        this.text = text;
+    protected Token(String lexeme) {
+        this.lexeme = lexeme;
     }
 
-    public String getText() {
-        return text;
+    public String getLexeme() {
+        return lexeme;
     }
 }

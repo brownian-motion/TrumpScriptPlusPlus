@@ -227,7 +227,7 @@ public class TokenizerDFA {
                 case KEYWORD_A_:
                     advancePeek();
                     if (!tryToGoToKeywordStateWith('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH)
-                            && !tryToGoToKeywordStateWith('n',TokenizerPDAState.KEYWORD_AN_)
+                            && !tryToGoToKeywordStateWith('n', TokenizerPDAState.KEYWORD_AN_)
                             && !tryToGoToKeywordStateWith('m', TokenizerPDAState.KEYWORD_AM_)) {
                         tryToGoToKeywordStateWithCharElseHandleMismatch('g', TokenizerPDAState.KEYWORD_AG_);
                     }
@@ -269,6 +269,42 @@ public class TokenizerDFA {
                     break;
 //                case KEYWORD_MORE_:
 //                    break;
+                case KEYWORD_AM_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('e', TokenizerPDAState.KEYWORD_AME_);
+                    break;
+                case KEYWORD_AME_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('r', TokenizerPDAState.KEYWORD_AMER_);
+                    break;
+                case KEYWORD_AMER_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('i', TokenizerPDAState.KEYWORD_AMERI_);
+                    break;
+                case KEYWORD_AMERI_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('c', TokenizerPDAState.KEYWORD_AMERIC_);
+                    break;
+                case KEYWORD_AMERIC_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('a', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_I_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_E_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('l', TokenizerPDAState.KEYWORD_EL_);
+                    break;
+                case KEYWORD_EL_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('s', TokenizerPDAState.KEYWORD_ELS_);
+                    break;
+                case KEYWORD_ELS_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('e', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
                 case KEYWORD_N_:
                     advancePeek();
                     tryToGoToKeywordStateWithCharElseHandleMismatch('u', TokenizerPDAState.KEYWORD_NU_);
@@ -383,6 +419,109 @@ public class TokenizerDFA {
                     break;
                 case ERR_OTHER:
                     //TODO: error handler, return  token
+                    break;
+                case KEYWORD_B_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('o', TokenizerPDAState.KEYWORD_BO_);
+                    break;
+                case KEYWORD_BO_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('o', TokenizerPDAState.KEYWORD_BOO_);
+                    break;
+                case KEYWORD_BOO_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('l', TokenizerPDAState.KEYWORD_BOOL_);
+                    break;
+                case KEYWORD_BOOL_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('e', TokenizerPDAState.KEYWORD_BOOLE_);
+                    break;
+                case KEYWORD_BOOLE_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('a', TokenizerPDAState.KEYWORD_BOOLEA_);
+                    break;
+                case KEYWORD_BOOLEA_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('n', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_L_:
+                    advancePeek();
+                    if (!tryToGoToKeywordStateWith('i', TokenizerPDAState.KEYWORD_LI_)
+                            && !tryToGoToKeywordStateWith('e', TokenizerPDAState.KEYWORD_LE_)) {
+                        tryToGoToKeywordStateWithCharElseHandleMismatch('o', TokenizerPDAState.KEYWORD_LO_);
+                    }
+                    break;
+                case KEYWORD_LO_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('n', TokenizerPDAState.KEYWORD_LON_);
+                    break;
+                case KEYWORD_LON_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('g', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_T_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('e', TokenizerPDAState.KEYWORD_TE_);
+                    break;
+                case KEYWORD_TE_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('l', TokenizerPDAState.KEYWORD_TEL_);
+                    break;
+                case KEYWORD_TEL_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('l', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_S_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('a', TokenizerPDAState.KEYWORD_SA_);
+                    break;
+                case KEYWORD_SA_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('y', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_F_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('a', TokenizerPDAState.KEYWORD_FA_);
+                    break;
+                case KEYWORD_FA_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('c', TokenizerPDAState.KEYWORD_FAC_);
+                    break;
+                case KEYWORD_FAC_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('t', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_LI_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('e', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_NO_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('t', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_O_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('r', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_LE_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('s', TokenizerPDAState.KEYWORD_LES_);
+                    break;
+                case KEYWORD_LES_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
+                case KEYWORD_TI_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('m', TokenizerPDAState.KEYWORD_TIM_);
+                    break;
+                case KEYWORD_TIM_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('e', TokenizerPDAState.KEYWORD_TIME_);
+                    break;
+                case KEYWORD_TIME_:
+                    advancePeek();
+                    tryToGoToKeywordStateWithCharElseHandleMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
                     break;
             }
         }

@@ -6,6 +6,6 @@ public class StringLiteralToken extends Token {
     }
 
     public String getLiteralContents(){
-        return getText().substring(1, getText().length()-1);
+        return getLexeme().substring(1, getLexeme().length()-1);
     }
 }
