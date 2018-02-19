@@ -475,6 +475,12 @@ public class TokenizerDFA {
         }
     }
 
+    /**
+     * Appends the current {@link #peek} character to the current token,
+     * then advances {@link #peek}.
+     * @see #advancePeek()
+     * @throws IOException if there is an IOException reading the next character
+     */
     private void appendPeekToCurrentToken() throws IOException {
         tokenBuilder.append(peek);
         advancePeek();
