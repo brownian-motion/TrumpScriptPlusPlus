@@ -1,6 +1,6 @@
 package com.brownian.trumpscript;
 
-import com.brownian.trumpscript.token.Token;
+import com.brownian.trumpscript.tokenizer.token.Token;
 
 import java.util.HashMap;
 import java.util.Map;

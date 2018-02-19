@@ -1,6 +1,7 @@
-package com.brownian.trumpscript;
+package com.brownian.trumpscript.tokenizer;
 
-import com.brownian.trumpscript.token.Token;
+import com.brownian.trumpscript.SymbolTable;
+import com.brownian.trumpscript.tokenizer.token.Token;
 
 import java.io.IOException;
 import java.io.StringReader;
