@@ -1,6 +1,7 @@
 package com.brownian.trumpscript.tokenizer;
 
 import com.brownian.trumpscript.SymbolTable;
+import com.brownian.trumpscript.TrumpscriptErrorReporter;
 import com.brownian.trumpscript.tokenizer.token.Token;
 
 import java.io.IOException;
@@ -12,8 +13,9 @@ public class TokenizerDemo {
     public static void main(String[] args) {
         try (StringReader americaIsGreatReader = new StringReader(AMERICA_IS_GREAT)) {
             SymbolTable symbolTable = new SymbolTable();
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable);
-            while (!tokenizerDFA.isAtEOF()) {
+            TrumpscriptErrorReporter errorHandler = new TrumpscriptErrorReporter(System.err);
+            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorHandler);
+            while (tokenizerDFA.hasMoreTokens()) {
                 Token token = tokenizerDFA.getNextToken();
                 System.out.printf("%s: <<%s>>\n", token.getClass(), token.getLexeme());
             }
