@@ -1,4 +1,4 @@
-package com.brownian.trumpscript.tokenizer;
+package com.brownian.trumpscript.tokenizer.error;
 
 public class IdTokenizerError extends TrumpscriptTokenizerError {
 

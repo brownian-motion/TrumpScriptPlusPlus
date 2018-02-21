@@ -2,6 +2,9 @@ package com.brownian.trumpscript.tokenizer;
 
 import com.brownian.trumpscript.SymbolTable;
 import com.brownian.trumpscript.TrumpscriptErrorReporter;
+import com.brownian.trumpscript.tokenizer.error.ConstTokenizerError;
+import com.brownian.trumpscript.tokenizer.error.IdTokenizerError;
+import com.brownian.trumpscript.tokenizer.error.TrumpscriptTokenizerError;
 import com.brownian.trumpscript.tokenizer.token.*;
 
 import java.io.EOFException;

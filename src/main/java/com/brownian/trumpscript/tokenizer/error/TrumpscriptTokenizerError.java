@@ -1,4 +1,4 @@
-package com.brownian.trumpscript.tokenizer;
+package com.brownian.trumpscript.tokenizer.error;
 
 public class TrumpscriptTokenizerError extends TrumpscriptError {
     private static final String UNSPECIFIED_ERROR_MESSAGE = "UNSPECIFIED ERROR MESSAGE";

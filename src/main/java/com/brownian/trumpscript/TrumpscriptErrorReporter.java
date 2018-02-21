@@ -1,6 +1,6 @@
 package com.brownian.trumpscript;
 
-import com.brownian.trumpscript.tokenizer.TrumpscriptError;
+import com.brownian.trumpscript.tokenizer.error.TrumpscriptError;
 
 import java.io.PrintStream;
 
