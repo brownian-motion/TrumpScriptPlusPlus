@@ -34,6 +34,7 @@ public class TokenizerDFA {
 
     /**
      * Reads and returns the next token from input
+     *
      * @return the next token to be read from input
      * @throws IOException if an error is encountered while reading in a character, or if all of the tokens have been read
      * @see #hasMoreTokens()
@@ -135,16 +136,13 @@ public class TokenizerDFA {
                                 break;
                             }
                     }
-
+                    break; // out of the state switch
                 case ID:
-                    if (Character.isLetterOrDigit(peek)) {
+                    if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek)) {
+                        currentState = TokenizerPDAState.EMIT_ID;
+                        break;
+                    } else if (Character.isLetterOrDigit(peek)) {
                         appendPeekToCurrentToken();
-                        break;
-                    } else if (Character.isWhitespace(peek)) {
-                        currentState = TokenizerPDAState.EMIT_ID;
-                        break;
-                    } else if (isSpecialCharacter(peek)) {
-                        currentState = TokenizerPDAState.EMIT_ID;
                         break;
                     } else {
                         appendPeekToCurrentToken();
@@ -300,7 +298,7 @@ public class TokenizerDFA {
                     } else if (peek == '"') {
                         appendPeekToCurrentToken();
                         currentState = TokenizerPDAState.STRING_LITERAL_COMPLETE;
-                    } else if (Character.isLetterOrDigit(peek)) {
+                    } else if (Character.isLetterOrDigit(peek) || isSpecialCharacter(peek) || Character.isWhitespace(peek)) {
                         appendPeekToCurrentToken(); //and stay on this state
                     } else {
                         appendPeekToCurrentToken();
@@ -478,8 +476,9 @@ public class TokenizerDFA {
     /**
      * Appends the current {@link #peek} character to the current token,
      * then advances {@link #peek}.
-     * @see #advancePeek()
+     *
      * @throws IOException if there is an IOException reading the next character
+     * @see #advancePeek()
      */
     private void appendPeekToCurrentToken() throws IOException {
         tokenBuilder.append(peek);
@@ -490,11 +489,12 @@ public class TokenizerDFA {
     /**
      * Tries to read the given character as the next character of a keyword,
      * and goes to the appropriate state if the next character is NOT that.
-     * @see #tryToGoToKeywordStateWith(char, TokenizerPDAState)
-     * @see #handleKeywordMismatch()
+     *
      * @param expectedCharacter
      * @param nextStateIfMatch
      * @throws IOException
+     * @see #tryToGoToKeywordStateWith(char, TokenizerPDAState)
+     * @see #handleKeywordMismatch()
      */
     private void tryToGoToKeywordStateWithCharElseHandleKeywordMismatch(char expectedCharacter, TokenizerPDAState nextStateIfMatch) throws IOException {
         if (!tryToGoToKeywordStateWith(expectedCharacter, nextStateIfMatch))
@@ -505,8 +505,9 @@ public class TokenizerDFA {
      * Tries to read the given expected character of a keyword, and then go to the given state if successful.
      * On success, appends that character to the current token and returns true.
      * On failure, returns false.
+     *
      * @param expectedCharacter the character of the keyword to try to read
-     * @param nextStateOnMatch the state to go to if that character is read
+     * @param nextStateOnMatch  the state to go to if that character is read
      * @return true if successful, and false otherwise
      * @throws IOException if an IOException is encountered while reading a character
      */
