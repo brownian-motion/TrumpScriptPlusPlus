@@ -27,7 +27,7 @@ public class SymbolTable {
     }
 
     /**
-     * Associates the given lexem with the given token
+     * Associates the given lexeme with the given token
      * @param lexeme the text referring to the given token (case-insensitive)
      * @param token the {@link Token} value for this lexeme
      * @return the previously-stored {@link Token} associated with the given lexeme, if any (null in none)
@@ -38,7 +38,7 @@ public class SymbolTable {
 
     /**
      * Returns the entries in this {@link SymbolTable} as a {@link Map}, for easy traversal.
-     * @return A {@link Map} containing the {@link String} -> {@link Token} entries in this {@link SymbolTable}
+     * @return A {@link Map} containing the {@link String} ↦ {@link Token} entries in this {@link SymbolTable}
      */
     public Map<String, Token> getEntries(){
         return Collections.unmodifiableMap(symbolTable);
