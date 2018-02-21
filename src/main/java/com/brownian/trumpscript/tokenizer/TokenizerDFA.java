@@ -45,7 +45,7 @@ public class TokenizerDFA {
         while (true) {
             switch (currentState) {
                 case INITIAL_STATE:
-                    skipOverWhitespace();
+                    skipOverCommentsAndWhitespace();
                     if (isAtEOF()) {
                         throw new NoMoreTokensException();
                     }
@@ -138,7 +138,7 @@ public class TokenizerDFA {
                     }
                     break; // out of the state switch
                 case ID:
-                    if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek)) {
+                    if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek) || peek == '#') {
                         currentState = TokenizerPDAState.EMIT_ID;
                         break;
                     } else if (Character.isLetterOrDigit(peek)) {
@@ -162,7 +162,7 @@ public class TokenizerDFA {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
                     break;
                 case KEYWORD_POSSIBLE_MATCH:
-                    if (isAtEOF() || isSpecialCharacter(peek) || Character.isWhitespace(peek)) {
+                    if (isAtEOF() || isSpecialCharacter(peek) || Character.isWhitespace(peek) || peek == '#') {
                         currentState = TokenizerPDAState.EMIT_KEYWORD;
                     } else {
                         handleKeywordMismatch();
@@ -300,13 +300,15 @@ public class TokenizerDFA {
                         currentState = TokenizerPDAState.STRING_LITERAL_COMPLETE;
                     } else if (Character.isLetterOrDigit(peek) || isSpecialCharacter(peek) || Character.isWhitespace(peek)) {
                         appendPeekToCurrentToken(); //and stay on this state
+                    } else if (peek == '#') {
+                        currentState = TokenizerPDAState.ERR_OTHER;
                     } else {
                         appendPeekToCurrentToken();
                         currentState = TokenizerPDAState.ERR_OTHER;
                     }
                     break;
                 case STRING_LITERAL_COMPLETE:
-                    if (isAtEOF() || Character.isWhitespace(peek)) {
+                    if (isAtEOF() || Character.isWhitespace(peek) || peek == '#') {
                         currentState = TokenizerPDAState.EMIT_STRING_LITERAL;
                     } else {
                         appendPeekToCurrentToken();
@@ -332,7 +334,7 @@ public class TokenizerDFA {
                     tryToAdvanceConstToState(TokenizerPDAState.CONST);
                     break;
                 case CONST:
-                    if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek)) {
+                    if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek) || peek == '#') {
                         currentState = TokenizerPDAState.EMIT_CONST;
                     } else if (Character.isDigit(peek)) {
                         appendPeekToCurrentToken();
@@ -368,7 +370,7 @@ public class TokenizerDFA {
                 case EMIT_KEYWORD:
                     return new KeywordToken(tokenBuilder.toString());
                 case ERR_ID:
-                    if (isAtEOF() || Character.isWhitespace(peek)) {
+                    if (isAtEOF() || Character.isWhitespace(peek) || peek == '#') {
                         errorHandler.logError(new IdTokenizerError());
                         return new ErrorToken(tokenBuilder.toString());
                     } else {
@@ -376,7 +378,7 @@ public class TokenizerDFA {
                     }
                     break;
                 case ERR_CONST:
-                    if (isAtEOF() || Character.isWhitespace(peek)) {
+                    if (isAtEOF() || Character.isWhitespace(peek) || peek == '#') {
                         errorHandler.logError(new ConstTokenizerError());
                         return new ErrorToken(tokenBuilder.toString());
                     } else {
@@ -384,7 +386,7 @@ public class TokenizerDFA {
                     }
                     break;
                 case ERR_OTHER:
-                    if (isAtEOF() || Character.isWhitespace(peek)) {
+                    if (isAtEOF() || Character.isWhitespace(peek) || peek == '#') {
                         errorHandler.logError(new TrumpscriptTokenizerError());
                         return new ErrorToken(tokenBuilder.toString());
                     } else {
@@ -527,7 +529,7 @@ public class TokenizerDFA {
      * @throws IOException if there is a problem reading a character
      */
     private void tryToAdvanceConstToState(TokenizerPDAState nextStateOnMatch) throws IOException {
-        if (isAtEOF() || isSpecialCharacter(peek) || Character.isWhitespace(peek)) {
+        if (isAtEOF() || isSpecialCharacter(peek) || Character.isWhitespace(peek) || peek == '#') {
             currentState = TokenizerPDAState.ERR_CONST;
         } else if (Character.isDigit(peek)) {
             appendPeekToCurrentToken();
@@ -564,7 +566,7 @@ public class TokenizerDFA {
      * @throws IOException if an IOException is encountered while reading the next character
      */
     private void handleKeywordMismatch() throws IOException {
-        if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek)) {
+        if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek) || peek == '#') {
             currentState = TokenizerPDAState.EMIT_ID;
         } else if (Character.isLetterOrDigit(peek)) {
             appendPeekToCurrentToken();
@@ -597,13 +599,30 @@ public class TokenizerDFA {
     }
 
     public boolean hasMoreTokens() throws IOException {
-        skipOverWhitespace();
+        skipOverCommentsAndWhitespace();
         return !isAtEOF();
     }
 
     private void skipOverWhitespace() throws IOException {
-        while (!isAtEOF && Character.isWhitespace(peek))
+        while (!isAtEOF() && Character.isWhitespace(peek))
             advancePeek();
+    }
+
+    private void skipUntilNewline() throws IOException {
+        while (!isAtEOF() && peek != '\n')
+            advancePeek();
+    }
+
+    private void skipOverComments() throws IOException {
+        while (!isAtEOF() && peek == '#')
+            skipUntilNewline();
+    }
+
+    private void skipOverCommentsAndWhitespace() throws IOException {
+        while(!isAtEOF() && (Character.isWhitespace(peek) || peek == '#')){
+            skipOverWhitespace();
+            skipOverComments();
+        }
     }
 
     private enum TokenizerPDAState {

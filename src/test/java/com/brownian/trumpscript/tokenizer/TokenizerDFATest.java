@@ -58,6 +58,31 @@ class TokenizerDFATest {
     }
 
     @Test
+    void testCanReadThreeKeywordsIgnoringTrailingComment() throws IOException {
+        try (StringReader americaIsGreatReader = new StringReader( AMERICA_IS_GREAT + "# Except Alabama")) {
+            SymbolTable symbolTable = new SymbolTable();
+            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
+            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+
+            Token token = tokenizerDFA.getNextToken();
+            assertEquals("America", token.getLexeme(), "Mismatch on first token");
+            assertTrue(token instanceof KeywordToken, "Expected first token to be keyword");
+            assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after first, should be 3");
+
+            token = tokenizerDFA.getNextToken();
+            assertEquals("is", token.getLexeme(), "Mismatch on second token");
+            assertTrue(token instanceof KeywordToken, "Expected second token to be keyword");
+            assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after second, should be 3");
+
+            token = tokenizerDFA.getNextToken();
+            assertEquals("great", token.getLexeme(), "Mismatch on last (third) token");
+            assertTrue(token instanceof KeywordToken, "Expected third token to be keyword");
+            assertFalse(tokenizerDFA.hasMoreTokens(), "No EOF after last (third) token");
+        }
+    }
+
+    @Test
     void testCanReadSingleKeywordToken() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader(AMERICA_IS_GREAT)) {
             SymbolTable symbolTable = new SymbolTable();
