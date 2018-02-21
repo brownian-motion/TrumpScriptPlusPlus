@@ -2,6 +2,7 @@ package com.brownian.trumpscript;
 
 import com.brownian.trumpscript.tokenizer.token.Token;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,5 +16,9 @@ public class SymbolTable {
 
     public Token setToken(String lexeme, Token token){
         return symbolTable.put(lexeme.toLowerCase(), token);
+    }
+
+    public Map<String, Token> getEntries(){
+        return Collections.unmodifiableMap(symbolTable);
     }
 }

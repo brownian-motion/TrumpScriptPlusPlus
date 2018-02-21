@@ -10,24 +10,24 @@ public class TokenizerDemo {
     private static final String TOKENIZER_TEST_SCRIPT_RESOURCE_NAME = "TokenizerTestScript.trump";
 
     public static void main(String[] args) {
-        try (Reader testScriptReader = new BufferedReader(new InputStreamReader(getTokenizerTestTrumpScriptInputStream()))) {
-            printContentsOfReader(testScriptReader);
-        } catch (IOException e) {
-            System.err.println("IO ERROR");
-            e.printStackTrace();
-            return;
-        }
+        echoContentsOfTestScript();
 
         System.out.println();
 
+        tokenizeTestScriptAndPrintTokensAndSymbolTable();
+    }
+
+    private static void tokenizeTestScriptAndPrintTokensAndSymbolTable() {
         try (Reader testScriptReader = new BufferedReader(new InputStreamReader(getTokenizerTestTrumpScriptInputStream()))) {
             SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorHandler = new TrumpscriptErrorReporter(System.err);
+            TrumpscriptErrorReporter errorHandler = new TrumpscriptErrorReporter(System.out);
             TokenizerDFA tokenizerDFA = new TokenizerDFA(testScriptReader, symbolTable, errorHandler);
-            while (tokenizerDFA.hasMoreTokens()) {
-                Token token = tokenizerDFA.getNextToken();
-                System.out.printf("%s: <<%s>>\n", token.getClass(), token.getLexeme());
-            }
+
+            printAllTokensAndErrors(tokenizerDFA);
+
+            System.out.println();
+
+            printSymbolTable(symbolTable);
         } catch (IOException e) {
             System.err.println("IO ERROR");
             e.printStackTrace();
@@ -35,6 +35,38 @@ public class TokenizerDemo {
             System.err.println("Um what?");
             e.printStackTrace();
         }
+    }
+
+    private static void printSymbolTable(SymbolTable symbolTable) {
+        System.out.println("Symbol table entries:");
+        for (Token token : symbolTable.getEntries().values()) {
+            System.out.println(token);
+        }
+    }
+
+    private static void printAllTokensAndErrors(TokenizerDFA tokenizerDFA) throws IOException {
+        Token token;
+        System.out.flush();
+        while (tokenizerDFA.hasMoreTokens()) {
+            token = tokenizerDFA.getNextToken();
+            if (token.isValid()) {
+                System.out.println(token);
+                System.out.flush(); //make sure errors and tokens are interleaved correctly
+            } else {
+                System.err.flush();//make sure errors and tokens are interleaved correctly
+            }
+        }
+    }
+
+    private static void echoContentsOfTestScript() {
+        try (Reader testScriptReader = new BufferedReader(new InputStreamReader(getTokenizerTestTrumpScriptInputStream()))) {
+            printContentsOfReader(testScriptReader);
+        } catch (IOException e) {
+            System.err.println("IO ERROR");
+            e.printStackTrace();
+        }
+
+        System.out.println();
     }
 
     private static InputStream getTokenizerTestTrumpScriptInputStream() {
