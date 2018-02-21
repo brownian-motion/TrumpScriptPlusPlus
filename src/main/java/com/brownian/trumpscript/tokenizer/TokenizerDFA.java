@@ -517,9 +517,9 @@ public class TokenizerDFA {
      * Tries to read the given character as the next character of a keyword,
      * and goes to the appropriate state if the next character is NOT that.
      *
-     * @param expectedCharacter
-     * @param nextStateIfMatch
-     * @throws IOException
+     * @param expectedCharacter the next character of the keyword, which would indicate progression to the given state
+     * @param nextStateIfMatch  the state to progress to if that character is read
+     * @throws IOException if there is a problem reading input from the characterSource
      * @see #tryToGoToKeywordStateWith(char, TokenizerPDAState)
      * @see #handleKeywordMismatch()
      */
@@ -623,26 +623,60 @@ public class TokenizerDFA {
         return isAtEOF;
     }
 
+    /**
+     * Returns true of there are more tokens to read from the character source,
+     * and false otherwise.
+     * Automatically skips over any and all comments and whitespace before the
+     * next token (or end of file) is found.
+     *
+     * @return true if there are more tokens to be read
+     * @throws IOException if there is an IOException while reading from the character source
+     */
     public boolean hasMoreTokens() throws IOException {
         skipOverCommentsAndWhitespace();
         return !isAtEOF();
     }
 
+    /**
+     * Consumes characters until the 'peek' character is not a whitespace character
+     * @see Character#isWhitespace(char)
+     *
+     * @throws IOException if there is a problem reading from the characterSource
+     */
     private void skipOverWhitespace() throws IOException {
         while (!isAtEOF() && Character.isWhitespace(peek))
             advancePeek();
     }
 
+    /**
+     * Consumes characters until the newline character '\n' is found.
+     * This is used to skip over the body of comments.
+     *
+     * @throws IOException if there is a problem reading from the characterSource
+     */
     private void skipUntilNewline() throws IOException {
         while (!isAtEOF() && peek != '\n')
             advancePeek();
     }
 
+    /**
+     * If peek is the start of a comment, consumes input until the next line.
+     * @see #skipUntilNewline()
+     * @throws IOException if there is a problem reading from the characterSource
+     */
     private void skipOverComments() throws IOException {
         while (!isAtEOF() && peek == '#')
             skipUntilNewline();
     }
 
+    /**
+     * Skips over any whitespace or comments, until either the start of a token
+     * is found or the end of the file is reached.
+     * @see #skipOverComments()
+     * @see #skipOverWhitespace()
+     *
+     * @throws IOException if there is a problem reading from the character source
+     */
     private void skipOverCommentsAndWhitespace() throws IOException {
         while (!isAtEOF() && (Character.isWhitespace(peek) || peek == '#')) {
             skipOverWhitespace();
@@ -650,11 +684,23 @@ public class TokenizerDFA {
         }
     }
 
+    /**
+     * Represents all possible states for this {@link TokenizerDFA} while tokenizing/scanning from the characterSource.
+     *
+     * Note that there is not a unique state for each fully-read keyword:
+     * the behavior of the DFA after any keyword has been fully read is exactly the same for each,
+     * so they were combined into a single state, {@link #KEYWORD_POSSIBLE_MATCH}.
+     *
+     * @see #getNextToken()
+     */
     private enum TokenizerPDAState {
+        //used only at the beginning of the tokenizer/scanner function, to indicate the process has just begun
         INITIAL_STATE,
 
+        //intermediate state while reading an ID
         ID,
 
+        //intermediate states for reading each keyword
         KEYWORD_M_, KEYWORD_MA_, KEYWORD_MAK_,
         KEYWORD_P_, KEYWORD_PR_, KEYWORD_PRO_, KEYWORD_PROG_, KEYWORD_PROGR_, KEYWORD_PROGRA_,
         KEYWORD_PROGRAM_, KEYWORD_PROGRAMM_, KEYWORD_PROGRAMMI_, KEYWORD_PROGRAMMIN_,
@@ -677,17 +723,27 @@ public class TokenizerDFA {
         KEYWORD_MO_, KEYWORD_MOR_,
         KEYWORD_PL_, KEYWORD_PLU_,
         KEYWORD_TI_, KEYWORD_TIM_, KEYWORD_TIME_,
+        //final state after reading all of the characters for any keyword
         KEYWORD_POSSIBLE_MATCH,
 
+        //intermediate states for reading a string literal
         STRING_LITERAL_INCOMPLETE, STRING_LITERAL_COMPLETE,
 
+        //intermediate states for reading an integer constant
         CONST_DIGIT_1, CONST_DIGIT_2, CONST_DIGIT_3, CONST_DIGIT_4, CONST_DIGIT_5, CONST_DIGIT_6, CONST,
 
+        //states indicating the token has been completely read, and a Token should be returned
         EMIT_ID, EMIT_CONST, EMIT_STRING_LITERAL, EMIT_SPECIAL_CHARACTER, EMIT_KEYWORD,
 
+        //states indicating that an error has been encountered
         ERR_ID, ERR_CONST, ERR_OTHER
     }
 
+    /**
+     * An exception thrown by {@link #getNextToken()} if there is no more input with which to produce a token
+     * @see #getNextToken()
+     * @see #hasMoreTokens()
+     */
     private class NoMoreTokensException extends EOFException {
         NoMoreTokensException() {
             super("EOF reached; no more tokens to be read");
