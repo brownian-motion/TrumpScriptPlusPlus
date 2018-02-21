@@ -9,11 +9,11 @@ public class SymbolTable {
 
     private Map<String, Token> symbolTable = new HashMap<>();
 
-    public Token lookupToken(String tokenText){
-        return symbolTable.get(tokenText);
+    public Token lookupToken(String lexeme){
+        return symbolTable.get(lexeme.toLowerCase());
     }
 
-    public Token setToken(String tokenText, Token token){
-        return symbolTable.put(tokenText, token);
+    public Token setToken(String lexeme, Token token){
+        return symbolTable.put(lexeme.toLowerCase(), token);
     }
 }
