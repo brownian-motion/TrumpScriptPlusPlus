@@ -1,4 +1,4 @@
-package com.brownian.trumpscript.tokenizer.error;
+package com.brownian.trumpscript.error;
 
 public class TrumpscriptError extends Exception {
     public TrumpscriptError(String message){
