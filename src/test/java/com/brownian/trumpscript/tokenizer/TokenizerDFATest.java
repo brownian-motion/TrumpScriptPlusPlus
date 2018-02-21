@@ -14,6 +14,7 @@ class TokenizerDFATest {
 
     private static final String
             AMERICA_IS_GREAT = "America is great";
+    public static final String KEYWORDS_STRING = "make programming great again america is else number boolean if as long tell say fact lie not and or less more plus times";
 
     @Test
     void testIsAtEOFAfterReadingAllOfInput() throws IOException {
@@ -316,6 +317,26 @@ class TokenizerDFATest {
             TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
             TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
             assertFalse(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with only whitespace - but it says there are some tokens");
+        }
+    }
+
+    @Test
+    void testEachKeywordIsReadAsAKeyword() throws IOException {
+        try (StringReader americaIsGreatReader = new StringReader(KEYWORDS_STRING)) {
+            SymbolTable symbolTable = new SymbolTable();
+            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
+            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+
+            Token token;
+
+            String[] keywords = KEYWORDS_STRING.split("\\s+");
+            for(String keyword : keywords) {
+                token = tokenizerDFA.getNextToken();
+                assertEquals(keyword.toLowerCase(), token.getLexeme().toLowerCase(), "Mismatch on token lexeme");
+                assertTrue(token instanceof KeywordToken, "Expected token "+token+" to be read as a keyword");
+            }
+            assertFalse(tokenizerDFA.hasMoreTokens(), "No EOF after last token");
         }
     }
 }

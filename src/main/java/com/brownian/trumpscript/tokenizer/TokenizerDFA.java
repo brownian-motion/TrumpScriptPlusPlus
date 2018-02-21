@@ -27,7 +27,14 @@ public class TokenizerDFA {
      */
     private final static int EOF = -1;
 
-    //TODO: incorporate symbol table and error handler
+    /**
+     * Constructs a DFA that will tokenize/scan the input from characterSource, adding symbols to the given symbol table
+     * and logging any errors to the given errorHandler.
+     *
+     * @param characterSource the source of the text to tokenize/scan
+     * @param symbolTable     the symbol table to store tokens in, so that they're only read once each
+     * @param errorHandler    the error logger with which to log errors
+     */
     public TokenizerDFA(Reader characterSource, SymbolTable symbolTable, TrumpscriptErrorReporter errorHandler) {
         this.characterSource = characterSource;
         this.symbolTable = symbolTable;
@@ -113,6 +120,11 @@ public class TokenizerDFA {
                             appendPeekToCurrentToken();
                             currentState = TokenizerPDAState.KEYWORD_O_;
                             break;
+                        case 'n':
+                        case 'N':
+                            appendPeekToCurrentToken();
+                            currentState = TokenizerPDAState.KEYWORD_N_;
+                            break;
                         case '"':
                             appendPeekToCurrentToken();
                             currentState = TokenizerPDAState.STRING_LITERAL_INCOMPLETE;
@@ -172,7 +184,8 @@ public class TokenizerDFA {
                     }
                     break;
                 case KEYWORD_P_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('r', TokenizerPDAState.KEYWORD_PR_);
+                    if (!tryToGoToKeywordStateWith('l', TokenizerPDAState.KEYWORD_PL_))
+                        tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('r', TokenizerPDAState.KEYWORD_PR_);
                     break;
                 case KEYWORD_PR_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('o', TokenizerPDAState.KEYWORD_PRO_);
@@ -237,6 +250,7 @@ public class TokenizerDFA {
 //                    break;
                 case KEYWORD_AN_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('d', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    break;
                 case KEYWORD_PL_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('u', TokenizerPDAState.KEYWORD_PLU_);
                     break;
@@ -269,7 +283,8 @@ public class TokenizerDFA {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('a', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
                     break;
                 case KEYWORD_I_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordStateWith('f', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH))
+                        tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
                     break;
                 case KEYWORD_E_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('l', TokenizerPDAState.KEYWORD_EL_);
@@ -281,7 +296,8 @@ public class TokenizerDFA {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
                     break;
                 case KEYWORD_N_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('u', TokenizerPDAState.KEYWORD_NU_);
+                    if (!tryToGoToKeywordStateWith('o', TokenizerPDAState.KEYWORD_NO_))
+                        tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('u', TokenizerPDAState.KEYWORD_NU_);
                     break;
                 case KEYWORD_NU_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('m', TokenizerPDAState.KEYWORD_NUM_);
@@ -357,7 +373,12 @@ public class TokenizerDFA {
                 case EMIT_CONST:
                     Token constToken = symbolTable.lookupToken(tokenBuilder.toString());
                     if (constToken == null) {
-                        constToken = new IntegerConstantToken(Long.parseLong(tokenBuilder.toString()));
+                        long value = Long.parseLong(tokenBuilder.toString());
+                        if(value <= 1000000L){
+                            currentState = TokenizerPDAState.ERR_CONST;
+                            break;
+                        }
+                        constToken = new IntegerConstantToken(value);
                         symbolTable.setToken(tokenBuilder.toString(), constToken);
                     }
                     return constToken;
@@ -427,7 +448,8 @@ public class TokenizerDFA {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('g', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
                     break;
                 case KEYWORD_T_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_TE_);
+                    if (!tryToGoToKeywordStateWith('i', TokenizerPDAState.KEYWORD_TI_))
+                        tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_TE_);
                     break;
                 case KEYWORD_TE_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('l', TokenizerPDAState.KEYWORD_TEL_);
@@ -622,7 +644,7 @@ public class TokenizerDFA {
     }
 
     private void skipOverCommentsAndWhitespace() throws IOException {
-        while(!isAtEOF() && (Character.isWhitespace(peek) || peek == '#')){
+        while (!isAtEOF() && (Character.isWhitespace(peek) || peek == '#')) {
             skipOverWhitespace();
             skipOverComments();
         }
