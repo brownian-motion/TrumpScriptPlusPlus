@@ -4,6 +4,10 @@ package com.brownian.trumpscript.tokenizer.token;
  * A {@link Token} representing a reserved word in TrumpScript++.
  */
 public class KeywordToken extends Token {
+    /**
+     * Creates a {@link KeywordToken} for the given keyword lexeme
+     * @param keyword the keyword to make a token for
+     */
     public KeywordToken(String keyword){
         super(keyword, true);
     }
