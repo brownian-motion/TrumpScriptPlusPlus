@@ -41,7 +41,7 @@ public abstract class Token {
      */
     @Override
     public String toString(){
-        return String.format("%s (%s)", getLexeme(), getTokenTypeString());
+        return String.format("%s\t(%s)", getLexeme(), getTokenTypeString());
     }
 
     /**
