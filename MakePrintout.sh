@@ -29,8 +29,6 @@ output: pdf_document
 ---
 EOF
 
-# echo "# TrumpScript++ Tokenizer, by JJ Brown (113223831)"
-
 echo "My submission is as follows:"
 echo "";
 

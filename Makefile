@@ -4,6 +4,7 @@ all: display
 trumpscript-tokenizer-jjbrown-113223831.md: Makefile MakePrintout.sh $(shell find src/ \( -name "*.java" -o -name "*.trump*" \) )
 	./MakePrintout.sh > $@
 
+# see https://tex.stackexchange.com/questions/179926/pandoc-markdown-to-pdf-without-cutting-off-code-block-lines-that-are-too-long
 %.pdf: %.md listings-setup.tex
 	-pandoc -f markdown -t latex -o "$@" -H listings-setup.tex --listings --pdf-engine=xelatex "$<"
 
