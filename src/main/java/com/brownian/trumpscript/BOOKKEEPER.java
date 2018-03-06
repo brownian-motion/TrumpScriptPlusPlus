@@ -1,6 +1,6 @@
 package com.brownian.trumpscript;
 
-import com.brownian.trumpscript.tokenizer.TokenizerDFA;
+import com.brownian.trumpscript.tokenizer.SCANNER;
 import com.brownian.trumpscript.tokenizer.token.Token;
 
 import java.util.Collections;
@@ -9,10 +9,10 @@ import java.util.Map;
 
 /**
  * Contains unique mappings from a lexeme (case-insensitive) to its associated {@link Token}.
- * This is used by the {@link TokenizerDFA} to maintain a small collection of tokens, and to
+ * This is used by the {@link SCANNER} to maintain a small collection of tokens, and to
  * make sure all equivalent lexemes refer to the same thing.
  */
-public class SymbolTable {
+public class BOOKKEEPER {
 
     private Map<String, Token> symbolTable = new HashMap<>();
 
@@ -37,8 +37,8 @@ public class SymbolTable {
     }
 
     /**
-     * Returns the entries in this {@link SymbolTable} as a {@link Map}, for easy traversal.
-     * @return A {@link Map} containing the {@link String} ↦ {@link Token} entries in this {@link SymbolTable}
+     * Returns the entries in this {@link BOOKKEEPER} as a {@link Map}, for easy traversal.
+     * @return A {@link Map} containing the {@link String} ↦ {@link Token} entries in this {@link BOOKKEEPER}
      */
     public Map<String, Token> getEntries(){
         return Collections.unmodifiableMap(symbolTable);

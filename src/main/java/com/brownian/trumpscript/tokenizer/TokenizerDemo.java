@@ -1,7 +1,7 @@
 package com.brownian.trumpscript.tokenizer;
 
-import com.brownian.trumpscript.SymbolTable;
-import com.brownian.trumpscript.TrumpscriptErrorReporter;
+import com.brownian.trumpscript.BOOKKEEPER;
+import com.brownian.trumpscript.ERRORHANDLER;
 import com.brownian.trumpscript.tokenizer.token.Token;
 
 import java.io.*;
@@ -19,9 +19,9 @@ public class TokenizerDemo {
 
     private static void tokenizeTestScriptAndPrintTokensAndSymbolTable() {
         try (Reader testScriptReader = new BufferedReader(new InputStreamReader(getTokenizerTestTrumpScriptInputStream()))) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorHandler = new TrumpscriptErrorReporter(System.out);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(testScriptReader, symbolTable, errorHandler);
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorHandler = new ERRORHANDLER(System.out);
+            SCANNER tokenizerDFA = new SCANNER(testScriptReader, symbolTable, errorHandler);
 
             printAllTokensAndErrors(tokenizerDFA);
 
@@ -32,19 +32,19 @@ public class TokenizerDemo {
             System.err.println("IO ERROR");
             e.printStackTrace();
         } catch (Exception e){
-            System.err.println("Um what?");
+            System.err.println("Unexpected error");
             e.printStackTrace();
         }
     }
 
-    private static void printSymbolTable(SymbolTable symbolTable) {
+    private static void printSymbolTable(BOOKKEEPER symbolTable) {
         System.out.println("Symbol table entries:");
         for (Token token : symbolTable.getEntries().values()) {
             System.out.println(token);
         }
     }
 
-    private static void printAllTokensAndErrors(TokenizerDFA tokenizerDFA) throws IOException {
+    private static void printAllTokensAndErrors(SCANNER tokenizerDFA) throws IOException {
         Token token;
         System.out.flush();
         while (tokenizerDFA.hasMoreTokens()) {

@@ -1,7 +1,7 @@
 package com.brownian.trumpscript.tokenizer;
 
-import com.brownian.trumpscript.SymbolTable;
-import com.brownian.trumpscript.TrumpscriptErrorReporter;
+import com.brownian.trumpscript.BOOKKEEPER;
+import com.brownian.trumpscript.ERRORHANDLER;
 import com.brownian.trumpscript.tokenizer.token.*;
 import org.junit.jupiter.api.Test;
 
@@ -19,11 +19,11 @@ class TokenizerDFATest {
     @Test
     void testIsAtEOFAfterReadingAllOfInput() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader(AMERICA_IS_GREAT)) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
 
-            assertFalse(tokenizerDFA.isAtEOF(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            assertFalse(tokenizerDFA.isAtEOF(), "Just opened SCANNER - with contents - but it's at EOF");
             tokenizerDFA.getNextToken();
             assertFalse(tokenizerDFA.isAtEOF(), "EOF after first token, should be 3");
             tokenizerDFA.getNextToken();
@@ -36,10 +36,10 @@ class TokenizerDFATest {
     @Test
     void testCanReadThreeKeywordsWithExtraWhitespace() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader(" \n\t" + AMERICA_IS_GREAT + "   \r\n")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
@@ -61,10 +61,10 @@ class TokenizerDFATest {
     @Test
     void testCanReadThreeKeywordsIgnoringTrailingComment() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader( AMERICA_IS_GREAT + "# Except Alabama")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
@@ -86,10 +86,10 @@ class TokenizerDFATest {
     @Test
     void testCanReadSingleKeywordToken() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader(AMERICA_IS_GREAT)) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertFalse(tokenizerDFA.isAtEOF(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertFalse(tokenizerDFA.isAtEOF(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
@@ -101,10 +101,10 @@ class TokenizerDFATest {
     @Test
     void testCanReadTwoKeywordTokens() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader(AMERICA_IS_GREAT)) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertFalse(tokenizerDFA.isAtEOF(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertFalse(tokenizerDFA.isAtEOF(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
@@ -122,10 +122,10 @@ class TokenizerDFATest {
     @Test
     void testCanReadAmericaIsGreatThenEOF() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader(AMERICA_IS_GREAT)) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
@@ -145,17 +145,12 @@ class TokenizerDFATest {
     }
 
     @Test
-    void testCanReadSpecialCharacters() throws IOException {
-
-    }
-
-    @Test
     void testCanReadSingleId() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader("x")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("x", token.getLexeme(), "Mismatch on first token");
@@ -167,10 +162,10 @@ class TokenizerDFATest {
     @Test
     void testCanFormIdFromKeywordPlusALetter() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader("AmericaX")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("AmericaX", token.getLexeme(), "Mismatch on first token");
@@ -182,10 +177,10 @@ class TokenizerDFATest {
     @Test
     void testCanFormIdFromLettersAndNumbers() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader("Jenny8675309Number")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("Jenny8675309Number", token.getLexeme(), "Mismatch on first token");
@@ -197,10 +192,10 @@ class TokenizerDFATest {
     @Test
     void testCanFollowIdWithSpecialCharacter() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader("Jenny8675309Number!")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("Jenny8675309Number", token.getLexeme(), "Mismatch on first token");
@@ -217,10 +212,10 @@ class TokenizerDFATest {
     @Test
     void testCanReadEachSpecialCharacter() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader("Jenny8675309Number!?,:;()")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("Jenny8675309Number", token.getLexeme(), "Mismatch on first token");
@@ -267,10 +262,10 @@ class TokenizerDFATest {
     @Test
     void testCanReadStringLiteral() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader("\"Jenny8675309Number!\"")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("\"Jenny8675309Number!\"", token.getLexeme(), "Mismatch on first token");
@@ -282,10 +277,10 @@ class TokenizerDFATest {
     @Test
     void testCanReadValidConstToken() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader("1234567")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("1234567", token.getLexeme(), "Mismatch on first token");
@@ -298,10 +293,10 @@ class TokenizerDFATest {
     @Test
     void testCanFormIdFromKeywordMinusALetter() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader("Americ")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token = tokenizerDFA.getNextToken();
             assertEquals("Americ", token.getLexeme(), "Mismatch on first token");
@@ -313,20 +308,20 @@ class TokenizerDFATest {
     @Test
     void testOnlyWhitespaceIndicatesNoMoreTokens() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader(" \n\r\t\n ")) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertFalse(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with only whitespace - but it says there are some tokens");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertFalse(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with only whitespace - but it says there are some tokens");
         }
     }
 
     @Test
     void testEachKeywordIsReadAsAKeyword() throws IOException {
         try (StringReader americaIsGreatReader = new StringReader(KEYWORDS_STRING)) {
-            SymbolTable symbolTable = new SymbolTable();
-            TrumpscriptErrorReporter errorReporter = new TrumpscriptErrorReporter(System.err);
-            TokenizerDFA tokenizerDFA = new TokenizerDFA(americaIsGreatReader, symbolTable, errorReporter);
-            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened TokenizerDFA - with contents - but it's at EOF");
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorReporter = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(americaIsGreatReader, symbolTable, errorReporter);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
 
             Token token;
 

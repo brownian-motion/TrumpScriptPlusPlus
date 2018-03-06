@@ -1,7 +1,7 @@
 package com.brownian.trumpscript.tokenizer;
 
-import com.brownian.trumpscript.SymbolTable;
-import com.brownian.trumpscript.TrumpscriptErrorReporter;
+import com.brownian.trumpscript.BOOKKEEPER;
+import com.brownian.trumpscript.ERRORHANDLER;
 import com.brownian.trumpscript.tokenizer.error.ConstTokenizerError;
 import com.brownian.trumpscript.tokenizer.error.IdTokenizerError;
 import com.brownian.trumpscript.tokenizer.error.TrumpscriptTokenizerError;
@@ -12,15 +12,15 @@ import java.io.IOException;
 import java.io.Reader;
 
 
-public class TokenizerDFA {
+public class SCANNER {
 
-    private final SymbolTable symbolTable;
+    private final BOOKKEEPER symbolTable;
     private Reader characterSource;
     private char peek;
     private boolean isAtEOF = false;
     private TokenizerPDAState currentState;
     private StringBuilder tokenBuilder;
-    private TrumpscriptErrorReporter errorHandler;
+    private ERRORHANDLER errorHandler;
 
     /**
      * @see Reader#read() The value returned when read()ing from the end of the file.
@@ -35,7 +35,7 @@ public class TokenizerDFA {
      * @param symbolTable     the symbol table to store tokens in, so that they're only read once each
      * @param errorHandler    the error logger with which to log errors
      */
-    public TokenizerDFA(Reader characterSource, SymbolTable symbolTable, TrumpscriptErrorReporter errorHandler) {
+    public SCANNER(Reader characterSource, BOOKKEEPER symbolTable, ERRORHANDLER errorHandler) {
         this.characterSource = characterSource;
         this.symbolTable = symbolTable;
         this.errorHandler = errorHandler;
@@ -614,7 +614,7 @@ public class TokenizerDFA {
     }
 
     /**
-     * Determines whether or not this TokenizerDFA has consumed all of the characters from the characterSource,
+     * Determines whether or not this SCANNER has consumed all of the characters from the characterSource,
      * and is at the end of its input. This happens when {@link Reader#read()} returns -1.
      *
      * @return true if there are no more characters to consume, and false otherwise.
@@ -685,7 +685,7 @@ public class TokenizerDFA {
     }
 
     /**
-     * Represents all possible states for this {@link TokenizerDFA} while tokenizing/scanning from the characterSource.
+     * Represents all possible states for this {@link SCANNER} while tokenizing/scanning from the characterSource.
      *
      * Note that there is not a unique state for each fully-read keyword:
      * the behavior of the DFA after any keyword has been fully read is exactly the same for each,

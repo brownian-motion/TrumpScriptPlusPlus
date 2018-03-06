@@ -4,10 +4,10 @@ import com.brownian.trumpscript.error.TrumpscriptError;
 
 import java.io.PrintStream;
 
-public class TrumpscriptErrorReporter {
+public class ERRORHANDLER {
     private PrintStream outputStreamWriter;
 
-    public TrumpscriptErrorReporter(PrintStream outputStreamWriter) {
+    public ERRORHANDLER(PrintStream outputStreamWriter) {
         this.outputStreamWriter = outputStreamWriter;
     }
 

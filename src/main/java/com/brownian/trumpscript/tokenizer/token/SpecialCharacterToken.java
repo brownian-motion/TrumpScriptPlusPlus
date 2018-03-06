@@ -1,8 +1,10 @@
 package com.brownian.trumpscript.tokenizer.token;
 
+import com.brownian.trumpscript.tokenizer.SCANNER;
+
 /**
  * A {@link Token} representing a single special character in TrumpScript++.
- * Special characters are determined by {@link com.brownian.trumpscript.tokenizer.TokenizerDFA#isSpecialCharacter(char)}
+ * Special characters are determined by {@link SCANNER#isSpecialCharacter(char)}
  */
 public class SpecialCharacterToken extends Token{
     private char specialCharacter;
