@@ -11,12 +11,13 @@ import java.io.*;
  * to the specifications of the first project.
  */
 public class TokenizerDemo {
-    private static final String TOKENIZER_TEST_SCRIPT_RESOURCE_NAME = "TokenizerTestScript.trump";
+    private static final String TOKENIZER_TEST_SCRIPT_RESOURCE_NAME = "TokenizerTestScript.trump",
+                                MAJOR_SEPARATOR="=========================";
 
     public static void main(String[] args) {
         echoContentsOfTestScript();
 
-        System.out.println();
+        System.out.println(MAJOR_SEPARATOR);
 
         tokenizeTestScriptAndPrintTokensAndSymbolTable();
     }
@@ -34,7 +35,7 @@ public class TokenizerDemo {
 
             printAllTokensAndErrors(tokenizerDFA);
 
-            System.out.println();
+            System.out.println(MAJOR_SEPARATOR);
 
             printSymbolTable(symbolTable);
         } catch (IOException e) {
