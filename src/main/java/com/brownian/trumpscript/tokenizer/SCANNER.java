@@ -139,7 +139,11 @@ public class SCANNER {
                                 break;
                             } else if (Character.isDigit(peek)) {
                                 appendPeekToCurrentToken();
-                                currentState = TokenizerPDAState.CONST_DIGIT_1;
+                                if(peek == '0'){
+                                    currentState = TokenizerPDAState.ERR_CONST;
+                                } else {
+                                    currentState = TokenizerPDAState.CONST_DIGIT_1;
+                                }
                                 break;
                             } else if (isSpecialCharacter(peek)) {
                                 appendPeekToCurrentToken();
