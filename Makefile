@@ -11,4 +11,4 @@ display: trumpscript-tokenizer-jjbrown-113223831.pdf
 	explorer $<;
 
 clean:
-	rm -rf trumpscript-tokenizer-jjbrown-113223831.pdf trumpscript-tokenizer-jjbrown-113223831.md
+	rm -rf trumpscript-tokenizer-jjbrown-113223831.pdf trumpscript-tokenizer-jjbrown-113223831.md tex2pdf*
