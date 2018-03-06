@@ -138,10 +138,11 @@ public class SCANNER {
                                 currentState = TokenizerPDAState.ID;
                                 break;
                             } else if (Character.isDigit(peek)) {
-                                appendPeekToCurrentToken();
                                 if(peek == '0'){
+                                    appendPeekToCurrentToken(); //happens inside the if statement, so we inspect peek AND THEN change the character
                                     currentState = TokenizerPDAState.ERR_CONST;
                                 } else {
+                                    appendPeekToCurrentToken();
                                     currentState = TokenizerPDAState.CONST_DIGIT_1;
                                 }
                                 break;

@@ -6,6 +6,7 @@ import com.brownian.trumpscript.tokenizer.token.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -332,6 +333,21 @@ class TokenizerDFATest {
                 assertTrue(token instanceof KeywordToken, "Expected token "+token+" to be read as a keyword");
             }
             assertFalse(tokenizerDFA.hasMoreTokens(), "No EOF after last token");
+        }
+    }
+
+    @Test
+    void testCanRead2MillionAsAConst() throws IOException {
+        try (Reader twoMillionReader = new StringReader("2000000")) {
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorhandler = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(twoMillionReader, symbolTable, errorhandler);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
+
+            Token token = tokenizerDFA.getNextToken();
+            assertEquals("2000000", token.getLexeme(), "Lexeme read doesn't match input");
+            assertTrue(token instanceof IntegerConstantToken, "Tried to read integer const, but failed. Read instead: "+token);
+            assertEquals(2000000L, ((IntegerConstantToken) token).getValue() , "Value doesn't match");
         }
     }
 }
