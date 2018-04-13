@@ -66,5 +66,17 @@ public enum StackItemType {
     BOOL_TAIL,
     TEST,
     ARITH,
-    ARITH_TAIL // 53
+    ARITH_TAIL; // 53
+
+    public boolean isStackBottom() {
+        return this == STACK_BOTTOM_MARKER;
+    }
+
+    public boolean isTerminal() {
+        return this.ordinal() >= 1 && this.ordinal() <= 33;
+    }
+
+    public boolean isNonterminal() {
+        return this.ordinal() >= 34;
+    }
 }
