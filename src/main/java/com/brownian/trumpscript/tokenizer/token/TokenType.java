@@ -83,6 +83,9 @@ public enum TokenType {
         if(this == ID || this == CONST || this == STRING){
             return String.format("[%s]", this.name().toLowerCase());
         }
+        if(this == MALFORMED_TOKEN){
+            return this.name();
+        }
         throw new IllegalStateException("Calling toString() of unexpected, unknown token type "+this.name());
     }
 }
