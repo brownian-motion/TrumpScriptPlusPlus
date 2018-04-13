@@ -79,4 +79,49 @@ public enum StackItemType {
     public boolean isNonterminal() {
         return this.ordinal() >= 34;
     }
+
+    public boolean isKeyword(){
+        return this.isTerminal() && this.ordinal() >= 4 && this.ordinal() <= 26;
+    }
+
+    public boolean isSpecialSymbol(){
+        return this.isTerminal() && this.ordinal() >= 27 && this.ordinal() <= 33;
+    }
+
+    @Override
+    public String toString(){
+        if(this.isStackBottom()) {
+            return "Z₀";
+        }
+        if(this.isKeyword()){
+            return this.name().toLowerCase();
+        }
+        if(this.isNonterminal()){
+            return String.format("<%s>", this.name().toLowerCase());
+        }
+        if(this.isSpecialSymbol()){
+            switch(this){
+                case COMMA:
+                    return ",";
+                case SEMICOLON:
+                    return ";";
+                case COLON:
+                    return ":";
+                case EXCLAMATION_MARK:
+                    return "!";
+                case QUESTION_MARK:
+                    return "?";
+                case LEFT_PAREN:
+                    return "(";
+                case RIGHT_PAREN:
+                    return ")";
+                default:
+                    throw new IllegalStateException("Calling toString() of unexpected special symbol "+this.name());
+            }
+        }
+        if(this == ID || this == CONST || this == STRING){
+            return String.format("[%s]", this.name().toLowerCase());
+        }
+        throw new IllegalStateException("Calling toString() of unexpected, unknown stack item type "+this.name());
+    }
 }
