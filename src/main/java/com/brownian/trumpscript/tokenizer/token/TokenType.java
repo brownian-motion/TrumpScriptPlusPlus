@@ -45,5 +45,44 @@ public enum TokenType {
     EXCLAMATION_MARK,
     QUESTION_MARK,
     LEFT_PAREN,
-    RIGHT_PAREN // 33
+    RIGHT_PAREN; // 33
+
+    public boolean isKeyword(){
+        return this.ordinal() >= 4 && this.ordinal() <= 26;
+    }
+
+    public boolean isSpecialSymbol(){
+        return this.ordinal() >= 27 && this.ordinal() <= 33;
+    }
+
+    @Override
+    public String toString(){
+        if(this.isKeyword()){
+            return this.name().toLowerCase();
+        }
+        if(this.isSpecialSymbol()){
+            switch(this){
+                case COMMA:
+                    return ",";
+                case SEMICOLON:
+                    return ";";
+                case COLON:
+                    return ":";
+                case EXCLAMATION_MARK:
+                    return "!";
+                case QUESTION_MARK:
+                    return "?";
+                case LEFT_PAREN:
+                    return "(";
+                case RIGHT_PAREN:
+                    return ")";
+                default:
+                    throw new IllegalStateException("Calling toString() of unexpected special symbol "+this.name());
+            }
+        }
+        if(this == ID || this == CONST || this == STRING){
+            return String.format("[%s]", this.name().toLowerCase());
+        }
+        throw new IllegalStateException("Calling toString() of unexpected, unknown token type "+this.name());
+    }
 }
