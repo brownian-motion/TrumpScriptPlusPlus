@@ -3,16 +3,16 @@ package com.brownian.trumpscript.parser;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class StackItem {
-    private StackItem[] children;
+public class LLStackItem {
+    private LLStackItem[] children;
     private StackItemType type;
 
-    public StackItem(StackItemType type) {
+    public LLStackItem(StackItemType type) {
         this.children = null;
         this.type = type;
     }
 
-    public void derive(StackItem... children) {
+    public void derive(LLStackItem... children) {
         this.children = children;
     }
 
@@ -20,12 +20,12 @@ public class StackItem {
         return children != null;
     }
 
-    public Optional<StackItem[]> getChildren() {
+    public Optional<LLStackItem[]> getChildren() {
         return Optional.ofNullable(this.children);
     }
 
-    public Optional<StackItem[]> backtrack() {
-        Optional<StackItem[]> prevChildren = this.getChildren();
+    public Optional<LLStackItem[]> backtrack() {
+        Optional<LLStackItem[]> prevChildren = this.getChildren();
         this.children = null;
         return prevChildren;
     }
