@@ -380,4 +380,71 @@ class TokenizerDFATest {
             assertEquals(2000000L, ((IntegerConstantToken) token).getValue() , "Value doesn't match");
         }
     }
+
+    @Test
+    void testMalformedConstIsMalformedToken() throws IOException {
+        try (Reader badTokenReader = new StringReader("12345vv 3421\"")) {
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorhandler = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(badTokenReader, symbolTable, errorhandler);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
+
+            Token token = tokenizerDFA.getNextToken();
+            assertEquals("12345vv", token.getLexeme(), "Lexeme read doesn't match input");
+            assertTrue(token instanceof ErrorToken, "Tried to read malformed integer const as bad token, but failed. Read instead: " + token);
+            assertEquals(TokenType.MALFORMED_TOKEN, token.getType());
+
+            token = tokenizerDFA.getNextToken();
+            assertEquals("3421\"", token.getLexeme(), "Lexeme read doesn't match input");
+            assertTrue(token instanceof ErrorToken, "Tried to read malformed integer const as bad token, but failed. Read instead: " + token);
+            assertEquals(TokenType.MALFORMED_TOKEN, token.getType());
+        }
+    }
+
+    @Test
+    void testSmallConstIsMalformedToken() throws IOException {
+        try (Reader badTokenReader = new StringReader("123456")) {
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorhandler = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(badTokenReader, symbolTable, errorhandler);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
+
+            Token token = tokenizerDFA.getNextToken();
+            assertEquals("123456", token.getLexeme(), "Lexeme read doesn't match input");
+            assertTrue(token instanceof ErrorToken, "Tried to read malformed (small-valued) integer const as bad token, but failed. Read instead: " + token);
+            assertEquals(TokenType.MALFORMED_TOKEN, token.getType());
+
+        }
+    }
+
+    @Test
+    void testOneMillionIsAMalformedToken() throws IOException {
+        try (Reader badTokenReader = new StringReader("1000000")) {
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorhandler = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(badTokenReader, symbolTable, errorhandler);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
+
+            Token token = tokenizerDFA.getNextToken();
+            assertEquals("1000000", token.getLexeme(), "Lexeme read doesn't match input");
+            assertTrue(token instanceof ErrorToken, "Tried to read malformed integer const as bad token, but failed. Read instead: " + token);
+            assertEquals(TokenType.MALFORMED_TOKEN, token.getType());
+        }
+    }
+
+    @Test
+    void testOneMillionAndOneIsAConstToken() throws IOException {
+        try (Reader badTokenReader = new StringReader("1000001")) {
+            BOOKKEEPER symbolTable = new BOOKKEEPER();
+            ERRORHANDLER errorhandler = new ERRORHANDLER(System.err);
+            SCANNER tokenizerDFA = new SCANNER(badTokenReader, symbolTable, errorhandler);
+            assertTrue(tokenizerDFA.hasMoreTokens(), "Just opened SCANNER - with contents - but it's at EOF");
+
+            Token token = tokenizerDFA.getNextToken();
+            assertEquals("1000001", token.getLexeme(), "Lexeme read doesn't match input");
+            assertTrue(token instanceof IntegerConstantToken, "Tried to read 1,000,001 as integer const token, but failed. Read instead: " + token);
+            assertEquals(TokenType.CONST, token.getType());
+            assertEquals(1000001L, ((IntegerConstantToken) token).getValue());
+        }
+    }
 }
