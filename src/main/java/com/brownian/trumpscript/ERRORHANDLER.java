@@ -23,7 +23,7 @@ public class ERRORHANDLER {
      * Logs the given error to this {@link ERRORHANDLER}'s {@link PrintStream}.
      * @param error the error to display to the user
      */
-    public void logError(TrumpscriptError error){
+    public synchronized void logError(TrumpscriptError error) {
         outputStreamWriter.println(error.getMessage());
     }
 }
