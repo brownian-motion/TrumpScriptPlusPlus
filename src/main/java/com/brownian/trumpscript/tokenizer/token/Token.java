@@ -48,6 +48,18 @@ public abstract class Token {
         return String.format("%s\t(%s)", getLexeme(), getTokenTypeString());
     }
 
+    @Override
+    public int hashCode() {
+        return getLexeme().toLowerCase().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Token))
+            return false;
+        return this.getLexeme().equalsIgnoreCase(((Token) other).getLexeme());
+    }
+
     /**
      * Indicates whether or not this {@link Token} is well-formed.
      * @return whether or not this {@link Token} is well-formed
