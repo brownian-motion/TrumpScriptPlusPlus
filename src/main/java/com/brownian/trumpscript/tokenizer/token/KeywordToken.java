@@ -7,9 +7,10 @@ public class KeywordToken extends Token {
     /**
      * Creates a {@link KeywordToken} for the given keyword lexeme
      * @param keyword the keyword to make a token for
+     * @param keywordType the type of this keyword  token
      */
-    public KeywordToken(String keyword){
-        super(keyword, true);
+    public KeywordToken(String keyword, TokenType keywordType) {
+        super(keyword, keywordType);
     }
 
     /**

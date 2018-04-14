@@ -6,7 +6,7 @@ package com.brownian.trumpscript.tokenizer.token;
  */
 public class StringLiteralToken extends Token {
     public StringLiteralToken(String stringLiteralStatement){
-        super(stringLiteralStatement, stringLiteralStatement.startsWith("\"") && stringLiteralStatement.endsWith("\""));
+        super(stringLiteralStatement, TokenType.STRING);
     }
 
     /**

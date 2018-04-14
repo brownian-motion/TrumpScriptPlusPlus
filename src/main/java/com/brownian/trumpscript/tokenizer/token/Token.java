@@ -5,17 +5,17 @@ package com.brownian.trumpscript.tokenizer.token;
  */
 public abstract class Token {
     private String lexeme;
-    private boolean isValid;
+    private TokenType type;
 
     /**
      * Creates a {@link Token} with the given text (valid or not),
      * and a flag indicating whether or not the token is well-formed.
      * @param lexeme the text of this token, as read from the TrumpScript++ source code
-     * @param isValid whether or not this token is well-formed
+     * @param type the type of this token. {@link TokenType#MALFORMED_TOKEN} indicates some kind of error
      */
-    protected Token(String lexeme, boolean isValid) {
+    protected Token(String lexeme, TokenType type) {
         this.lexeme = lexeme;
-        this.isValid = isValid;
+        this.type = type;
     }
 
     /**
@@ -33,6 +33,10 @@ public abstract class Token {
      */
     abstract protected String getTokenTypeString();
 
+    public TokenType getType() {
+        return this.type;
+    }
+
     /**
      * A short, human-readable representation of this {@link Token}, including its lexeme and its type.
      * @see #getLexeme()
@@ -49,6 +53,6 @@ public abstract class Token {
      * @return whether or not this {@link Token} is well-formed
      */
     public boolean isValid() {
-        return isValid;
+        return type != TokenType.MALFORMED_TOKEN;
     }
 }

@@ -19,7 +19,7 @@ public class IntegerConstantToken extends Token {
      * @param value the integer value of this constant token
      */
     public IntegerConstantToken(long value){
-        super(String.valueOf(value), true);
+        super(String.valueOf(value), TokenType.CONST);
 
         this.value = value;
     }

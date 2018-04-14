@@ -12,9 +12,13 @@ public class SpecialCharacterToken extends Token{
     /**
      * Constructs a {@link Token} representing the given special character
      * @param specialCharacter the special character for which to construct a {@link Token}
+     * @param type which kind of special character this is
      */
-    public SpecialCharacterToken(char specialCharacter){
-        super(Character.toString(specialCharacter), true);
+    public SpecialCharacterToken(char specialCharacter, TokenType type) {
+        super(Character.toString(specialCharacter), type);
+        if (!type.isSpecialSymbol()) {
+            throw new IllegalArgumentException("Tried to make a SpecialCharacterToken with a type that is not a special character: " + type);
+        }
 
         this.specialCharacter = specialCharacter;
     }

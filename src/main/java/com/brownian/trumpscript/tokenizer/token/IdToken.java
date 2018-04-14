@@ -9,7 +9,7 @@ public class IdToken extends Token {
      * @param id the lexeme to set as this {@link Token}'s identifier attribute
      */
     public IdToken(String id){
-        super(id, true);
+        super(id, TokenType.ID);
     }
 
     /**

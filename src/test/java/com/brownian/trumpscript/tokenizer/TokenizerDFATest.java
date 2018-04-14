@@ -45,16 +45,19 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof KeywordToken, "Expected first token to be keyword");
+            assertEquals(TokenType.AMERICA, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after first, should be 3");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("is", token.getLexeme(), "Mismatch on second token");
             assertTrue(token instanceof KeywordToken, "Expected second token to be keyword");
+            assertEquals(TokenType.IS, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after second, should be 3");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("great", token.getLexeme(), "Mismatch on last (third) token");
             assertTrue(token instanceof KeywordToken, "Expected third token to be keyword");
+            assertEquals(TokenType.GREAT, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "No EOF after last (third) token");
         }
     }
@@ -70,16 +73,19 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof KeywordToken, "Expected first token to be keyword");
+            assertEquals(TokenType.AMERICA, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after first, should be 3");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("is", token.getLexeme(), "Mismatch on second token");
             assertTrue(token instanceof KeywordToken, "Expected second token to be keyword");
+            assertEquals(TokenType.IS, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after second, should be 3");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("great", token.getLexeme(), "Mismatch on last (third) token");
             assertTrue(token instanceof KeywordToken, "Expected third token to be keyword");
+            assertEquals(TokenType.GREAT, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "No EOF after last (third) token");
         }
     }
@@ -95,6 +101,7 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof KeywordToken, "Expected first token to be keyword");
+            assertEquals(TokenType.AMERICA, token.getType());
             assertFalse(tokenizerDFA.isAtEOF(), "EOF after first token, should be 3");
         }
     }
@@ -110,11 +117,13 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof KeywordToken, "Expected first token to be keyword");
+            assertEquals(TokenType.AMERICA, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after first, should be 3");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("is", token.getLexeme(), "Mismatch on second token");
             assertTrue(token instanceof KeywordToken, "Expected first token to be keyword");
+            assertEquals(TokenType.IS, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after second, should be 3");
         }
     }
@@ -131,16 +140,19 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("America", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof KeywordToken, "Expected first token to be keyword");
+            assertEquals(TokenType.AMERICA, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after first, should be 3");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("is", token.getLexeme(), "Mismatch on second token");
             assertTrue(token instanceof KeywordToken, "Expected second token to be keyword");
+            assertEquals(TokenType.IS, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "No more tokens after second, should be 3");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("great", token.getLexeme(), "Mismatch on last (third) token");
             assertTrue(token instanceof KeywordToken, "Expected third token to be keyword");
+            assertEquals(TokenType.GREAT, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "No EOF after last (third) token");
         }
     }
@@ -156,6 +168,7 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("x", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof IdToken, "Expected first token to be id");
+            assertEquals(TokenType.ID, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "There should only be a single token");
         }
     }
@@ -171,6 +184,7 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("AmericaX", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof IdToken, "Expected first token to be id");
+            assertEquals(TokenType.ID, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "Should only be one token");
         }
     }
@@ -186,6 +200,7 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("Jenny8675309Number", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof IdToken, "Expected first token to be id");
+            assertEquals(TokenType.ID, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "Should only be one token");
         }
     }
@@ -201,11 +216,13 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("Jenny8675309Number", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof IdToken, "Expected first token to be id");
+            assertEquals(TokenType.ID, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "Shouldn't end after first token");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("!", token.getLexeme(), "Mismatch on second token");
             assertTrue(token instanceof SpecialCharacterToken, "Expected second token to be '!'");
+            assertEquals(TokenType.EXCLAMATION_MARK, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "Should only be two tokens");
         }
     }
@@ -221,41 +238,49 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("Jenny8675309Number", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof IdToken, "Expected first token to be id");
+            assertEquals(TokenType.ID, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "Ended at first token, should be 8");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("!", token.getLexeme(), "Mismatch on second token");
             assertTrue(token instanceof SpecialCharacterToken, "Expected second token to be '!'");
+            assertEquals(TokenType.EXCLAMATION_MARK, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "Ended at second token, should be 8");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("?", token.getLexeme(), "Mismatch on third token");
             assertTrue(token instanceof SpecialCharacterToken, "Expected third token to be '?'");
+            assertEquals(TokenType.QUESTION_MARK, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "Ended at third token, should be 8");
 
             token = tokenizerDFA.getNextToken();
             assertEquals(",", token.getLexeme(), "Mismatch on fourth token");
             assertTrue(token instanceof SpecialCharacterToken, "Expected fourth token to be ','");
+            assertEquals(TokenType.COMMA, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "Ended at fourth token, should be 8");
 
             token = tokenizerDFA.getNextToken();
             assertEquals(":", token.getLexeme(), "Mismatch on fifth token");
             assertTrue(token instanceof SpecialCharacterToken, "Expected fifth token to be ':'");
+            assertEquals(TokenType.COLON, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "Ended at fifth token, should be 8");
 
             token = tokenizerDFA.getNextToken();
             assertEquals(";", token.getLexeme(), "Mismatch on sixth token");
             assertTrue(token instanceof SpecialCharacterToken, "Expected sixth token to be ';'");
+            assertEquals(TokenType.SEMICOLON, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "Ended at sixth token, should be 8");
 
             token = tokenizerDFA.getNextToken();
             assertEquals("(", token.getLexeme(), "Mismatch on seventh token");
             assertTrue(token instanceof SpecialCharacterToken, "Expected seventh token to be '('");
+            assertEquals(TokenType.LEFT_PAREN, token.getType());
             assertTrue(tokenizerDFA.hasMoreTokens(), "Ended at seventh token, should be 8");
 
             token = tokenizerDFA.getNextToken();
             assertEquals(")", token.getLexeme(), "Mismatch on eighth token");
             assertTrue(token instanceof SpecialCharacterToken, "Expected eighth token to be ')'");
+            assertEquals(TokenType.RIGHT_PAREN, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "Didn't end at eighth token, should be only 8");
         }
     }
@@ -271,6 +296,7 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("\"Jenny8675309Number!\"", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof StringLiteralToken, "Expected first token to be string literal");
+            assertEquals(TokenType.STRING, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "Should only be one token");
         }
     }
@@ -286,6 +312,7 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("1234567", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof IntegerConstantToken, "Expected first token to be constant");
+            assertEquals(TokenType.CONST, token.getType());
             assertEquals(1234567L, ((IntegerConstantToken) token).getValue());
             assertFalse(tokenizerDFA.hasMoreTokens(), "Should only be one token");
         }
@@ -302,6 +329,7 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("Americ", token.getLexeme(), "Mismatch on first token");
             assertTrue(token instanceof IdToken, "Expected first token to be id");
+            assertEquals(TokenType.ID, token.getType());
             assertFalse(tokenizerDFA.hasMoreTokens(), "Should only be one token");
         }
     }
@@ -330,7 +358,8 @@ class TokenizerDFATest {
             for(String keyword : keywords) {
                 token = tokenizerDFA.getNextToken();
                 assertEquals(keyword.toLowerCase(), token.getLexeme().toLowerCase(), "Mismatch on token lexeme");
-                assertTrue(token instanceof KeywordToken, "Expected token "+token+" to be read as a keyword");
+                assertTrue(token instanceof KeywordToken, "Expected token " + token.getLexeme() + " to be read as a keyword");
+                assertEquals(keyword.toLowerCase(), token.getType().name().toLowerCase(), "Token type " + token.getType() + " didn't match expected lexeme " + keyword);
             }
             assertFalse(tokenizerDFA.hasMoreTokens(), "No EOF after last token");
         }
@@ -347,6 +376,7 @@ class TokenizerDFATest {
             Token token = tokenizerDFA.getNextToken();
             assertEquals("2000000", token.getLexeme(), "Lexeme read doesn't match input");
             assertTrue(token instanceof IntegerConstantToken, "Tried to read integer const, but failed. Read instead: "+token);
+            assertEquals(TokenType.CONST, token.getType());
             assertEquals(2000000L, ((IntegerConstantToken) token).getValue() , "Value doesn't match");
         }
     }

@@ -19,6 +19,7 @@ public class SCANNER {
     private char peek;
     private boolean isAtEOF = false;
     private TokenizerPDAState currentState;
+    private TokenType probableTypeOfToken;
     private StringBuilder tokenBuilder;
     private ERRORHANDLER errorHandler;
 
@@ -52,6 +53,8 @@ public class SCANNER {
     public Token getNextToken() throws IOException {
         tokenBuilder = new StringBuilder();
         currentState = TokenizerPDAState.INITIAL_STATE;
+        probableTypeOfToken = TokenType.MALFORMED_TOKEN; // until proven otherwise, just good initial value to catch errors early
+
         while (true) {
             switch (currentState) {
                 case INITIAL_STATE:
@@ -129,6 +132,27 @@ public class SCANNER {
                             appendPeekToCurrentToken();
                             currentState = TokenizerPDAState.STRING_LITERAL_INCOMPLETE;
                             break;
+                        case ',':
+                            appendPeekAndEmitSpecialCharacterToken(TokenType.COMMA);
+                            break;
+                        case ';':
+                            appendPeekAndEmitSpecialCharacterToken(TokenType.SEMICOLON);
+                            break;
+                        case ':':
+                            appendPeekAndEmitSpecialCharacterToken(TokenType.COLON);
+                            break;
+                        case '!':
+                            appendPeekAndEmitSpecialCharacterToken(TokenType.EXCLAMATION_MARK);
+                            break;
+                        case '?':
+                            appendPeekAndEmitSpecialCharacterToken(TokenType.QUESTION_MARK);
+                            break;
+                        case '(':
+                            appendPeekAndEmitSpecialCharacterToken(TokenType.LEFT_PAREN);
+                            break;
+                        case ')':
+                            appendPeekAndEmitSpecialCharacterToken(TokenType.RIGHT_PAREN);
+                            break;
                         default:
                             if (Character.isWhitespace(peek)) {
                                 advancePeek();
@@ -136,20 +160,20 @@ public class SCANNER {
                             } else if (Character.isAlphabetic(peek)) {
                                 appendPeekToCurrentToken();
                                 currentState = TokenizerPDAState.ID;
+                                probableTypeOfToken = TokenType.ID;
                                 break;
                             } else if (Character.isDigit(peek)) {
-                                if(peek == '0'){
+                                if (peek == '0') {
                                     appendPeekToCurrentToken(); //happens inside the if statement, so we inspect peek AND THEN change the character
                                     currentState = TokenizerPDAState.ERR_CONST;
+                                    probableTypeOfToken = TokenType.MALFORMED_TOKEN;
                                 } else {
                                     appendPeekToCurrentToken();
                                     currentState = TokenizerPDAState.CONST_DIGIT_1;
                                 }
                                 break;
                             } else if (isSpecialCharacter(peek)) {
-                                appendPeekToCurrentToken();
-                                currentState = TokenizerPDAState.EMIT_SPECIAL_CHARACTER;
-                                break;
+                                throw new IllegalStateException("Did not handle the special character " + peek);
                             } else {
                                 appendPeekToCurrentToken();
                                 currentState = TokenizerPDAState.ERR_ID;
@@ -179,7 +203,10 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('k', TokenizerPDAState.KEYWORD_MAK_);
                     break;
                 case KEYWORD_MAK_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    //noinspection JSUnusedGlobalSymbols
+                    if (!tryToGoToKeywordPossibleMatchStateAs('e', TokenType.MAKE)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_POSSIBLE_MATCH:
                     if (isAtEOF() || isSpecialCharacter(peek) || Character.isWhitespace(peek) || peek == '#') {
@@ -189,8 +216,9 @@ public class SCANNER {
                     }
                     break;
                 case KEYWORD_P_:
-                    if (!tryToGoToKeywordStateWith('l', TokenizerPDAState.KEYWORD_PL_))
+                    if (!tryToGoToKeywordStateWith('l', TokenizerPDAState.KEYWORD_PL_)) {
                         tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('r', TokenizerPDAState.KEYWORD_PR_);
+                    }
                     break;
                 case KEYWORD_PR_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('o', TokenizerPDAState.KEYWORD_PRO_);
@@ -217,10 +245,8 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('n', TokenizerPDAState.KEYWORD_PROGRAMMIN_);
                     break;
                 case KEYWORD_PROGRAMMIN_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('g', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('g', TokenType.PROGRAMMING);
                     break;
-//                case KEYWORD_PROGRAMMING_:
-//                    break;
                 case KEYWORD_G_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('r', TokenizerPDAState.KEYWORD_GR_);
                     break;
@@ -231,15 +257,15 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('a', TokenizerPDAState.KEYWORD_GREA_);
                     break;
                 case KEYWORD_GREA_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('t', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('t', TokenType.GREAT);
                     break;
 //                case KEYWORD_GREAT_:
 //                    break;
                 case KEYWORD_A_:
-                    if (!tryToGoToKeywordStateWith('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH)
-                            && !tryToGoToKeywordStateWith('n', TokenizerPDAState.KEYWORD_AN_)
-                            && !tryToGoToKeywordStateWith('m', TokenizerPDAState.KEYWORD_AM_)) {
-                        tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('g', TokenizerPDAState.KEYWORD_AG_);
+                    if (!tryToGoToKeywordStateWith('n', TokenizerPDAState.KEYWORD_AN_)
+                            && !tryToGoToKeywordStateWith('m', TokenizerPDAState.KEYWORD_AM_)
+                            && !tryToGoToKeywordStateWith('g', TokenizerPDAState.KEYWORD_AG_)) {
+                        tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('s', TokenType.AS);
                     }
                     break;
                 case KEYWORD_AG_:
@@ -249,29 +275,23 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('i', TokenizerPDAState.KEYWORD_AGAI_);
                     break;
                 case KEYWORD_AGAI_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('n', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('n', TokenType.AGAIN);
                     break;
-//                case KEYWORD_AGAIN_:
-//                    break;
                 case KEYWORD_AN_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('d', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('d', TokenType.AND);
                     break;
                 case KEYWORD_PL_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('u', TokenizerPDAState.KEYWORD_PLU_);
                     break;
                 case KEYWORD_PLU_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('s', TokenType.PLUS);
                     break;
-//                case KEYWORD_PLUS_:
-//                    break;
                 case KEYWORD_MO_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('r', TokenizerPDAState.KEYWORD_MOR_);
                     break;
                 case KEYWORD_MOR_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('e', TokenType.MORE);
                     break;
-//                case KEYWORD_MORE_:
-//                    break;
                 case KEYWORD_AM_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_AME_);
                     break;
@@ -285,11 +305,11 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('c', TokenizerPDAState.KEYWORD_AMERIC_);
                     break;
                 case KEYWORD_AMERIC_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('a', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('a', TokenType.AMERICA);
                     break;
                 case KEYWORD_I_:
-                    if (!tryToGoToKeywordStateWith('f', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH))
-                        tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('f', TokenType.IF))
+                        tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('s', TokenType.IS);
                     break;
                 case KEYWORD_E_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('l', TokenizerPDAState.KEYWORD_EL_);
@@ -298,11 +318,13 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('s', TokenizerPDAState.KEYWORD_ELS_);
                     break;
                 case KEYWORD_ELS_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    boolean result11;
+                    result11 = tryToGoToKeywordPossibleMatchStateAs('e', TokenType.ELSE) || handleKeywordMismatch();
                     break;
                 case KEYWORD_N_:
-                    if (!tryToGoToKeywordStateWith('o', TokenizerPDAState.KEYWORD_NO_))
+                    if (!tryToGoToKeywordStateWith('o', TokenizerPDAState.KEYWORD_NO_)) {
                         tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('u', TokenizerPDAState.KEYWORD_NU_);
+                    }
                     break;
                 case KEYWORD_NU_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('m', TokenizerPDAState.KEYWORD_NUM_);
@@ -314,7 +336,8 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_NUMBE_);
                     break;
                 case KEYWORD_NUMBE_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('r', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    boolean result10;
+                    result10 = tryToGoToKeywordPossibleMatchStateAs('r', TokenType.NUMBER) || handleKeywordMismatch();
                     break;
                 case STRING_LITERAL_INCOMPLETE:
                     if (isAtEOF()) {
@@ -379,7 +402,7 @@ public class SCANNER {
                     Token constToken = symbolTable.lookupToken(tokenBuilder.toString());
                     if (constToken == null) {
                         long value = Long.parseLong(tokenBuilder.toString());
-                        if(value <= 1000000L){
+                        if (value <= 1000000L) {
                             currentState = TokenizerPDAState.ERR_CONST;
                             break;
                         }
@@ -395,9 +418,12 @@ public class SCANNER {
                     }
                     return stringLiteralToken;
                 case EMIT_SPECIAL_CHARACTER:
-                    return new SpecialCharacterToken(tokenBuilder.charAt(0));
+                    return new SpecialCharacterToken(tokenBuilder.charAt(0), probableTypeOfToken);
                 case EMIT_KEYWORD:
-                    return new KeywordToken(tokenBuilder.toString());
+                    if (!probableTypeOfToken.isKeyword()) {
+                        throw new IllegalStateException(String.format("Trying to emit a keyword token with a type that isn't a keyword: %s as %s", tokenBuilder, probableTypeOfToken));
+                    }
+                    return new KeywordToken(tokenBuilder.toString(), probableTypeOfToken);
                 case ERR_ID:
                     if (isAtEOF() || Character.isWhitespace(peek) || peek == '#') {
                         errorHandler.logError(new IdTokenizerError());
@@ -438,7 +464,7 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('a', TokenizerPDAState.KEYWORD_BOOLEA_);
                     break;
                 case KEYWORD_BOOLEA_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('n', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch('n', TokenType.BOOLEAN);
                     break;
                 case KEYWORD_L_:
                     if (!tryToGoToKeywordStateWith('i', TokenizerPDAState.KEYWORD_LI_)
@@ -450,23 +476,30 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('n', TokenizerPDAState.KEYWORD_LON_);
                     break;
                 case KEYWORD_LON_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('g', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('g', TokenType.LONG)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_T_:
-                    if (!tryToGoToKeywordStateWith('i', TokenizerPDAState.KEYWORD_TI_))
+                    if (!tryToGoToKeywordStateWith('i', TokenizerPDAState.KEYWORD_TI_)) {
                         tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_TE_);
+                    }
                     break;
                 case KEYWORD_TE_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('l', TokenizerPDAState.KEYWORD_TEL_);
                     break;
                 case KEYWORD_TEL_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('l', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('l', TokenType.TELL)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_S_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('a', TokenizerPDAState.KEYWORD_SA_);
                     break;
                 case KEYWORD_SA_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('y', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('y', TokenType.SAY)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_F_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('a', TokenizerPDAState.KEYWORD_FA_);
@@ -475,22 +508,33 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('c', TokenizerPDAState.KEYWORD_FAC_);
                     break;
                 case KEYWORD_FAC_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('t', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('t', TokenType.FACT)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_LI_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('e', TokenType.LIE)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_NO_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('t', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('t', TokenType.NOT)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_O_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('r', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    boolean result2;
+                    if (!tryToGoToKeywordPossibleMatchStateAs('r', TokenType.OR)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_LE_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('s', TokenizerPDAState.KEYWORD_LES_);
                     break;
                 case KEYWORD_LES_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('s', TokenType.LESS)) {
+                        handleKeywordMismatch();
+                    }
                     break;
                 case KEYWORD_TI_:
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('m', TokenizerPDAState.KEYWORD_TIM_);
@@ -499,10 +543,26 @@ public class SCANNER {
                     tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('e', TokenizerPDAState.KEYWORD_TIME_);
                     break;
                 case KEYWORD_TIME_:
-                    tryToGoToKeywordStateWithCharElseHandleKeywordMismatch('s', TokenizerPDAState.KEYWORD_POSSIBLE_MATCH);
+                    if (!tryToGoToKeywordPossibleMatchStateAs('s', TokenType.TIMES)) {
+                        handleKeywordMismatch();
+                    }
                     break;
             }
         }
+    }
+
+    private void tryToGoToKeywordPossibleMatchStateElseHandleKeywordMismatch(char expectedCharacter, TokenType tokenTypIfMatched) throws IOException {
+        if (!tryToGoToKeywordPossibleMatchStateAs(expectedCharacter, tokenTypIfMatched)) {
+            handleKeywordMismatch();
+        }
+    }
+
+    private void appendPeekAndEmitSpecialCharacterToken(TokenType specialCharacterType) throws IOException {
+        appendPeekToCurrentToken();
+        if (!specialCharacterType.isSpecialSymbol())
+            throw new IllegalStateException("Trying to emit a special character token with a token type that isn't one: " + specialCharacterType);
+        probableTypeOfToken = specialCharacterType;
+        currentState = TokenizerPDAState.EMIT_SPECIAL_CHARACTER;
     }
 
     /**
@@ -524,13 +584,13 @@ public class SCANNER {
      *
      * @param expectedCharacter the next character of the keyword, which would indicate progression to the given state
      * @param nextStateIfMatch  the state to progress to if that character is read
+     * @return true if a character was read and matched as some type
      * @throws IOException if there is a problem reading input from the characterSource
      * @see #tryToGoToKeywordStateWith(char, TokenizerPDAState)
      * @see #handleKeywordMismatch()
      */
-    private void tryToGoToKeywordStateWithCharElseHandleKeywordMismatch(char expectedCharacter, TokenizerPDAState nextStateIfMatch) throws IOException {
-        if (!tryToGoToKeywordStateWith(expectedCharacter, nextStateIfMatch))
-            handleKeywordMismatch();
+    private boolean tryToGoToKeywordStateWithCharElseHandleKeywordMismatch(char expectedCharacter, TokenizerPDAState nextStateIfMatch) throws IOException {
+        return tryToGoToKeywordStateWith(expectedCharacter, nextStateIfMatch) || handleKeywordMismatch();
     }
 
     /**
@@ -551,6 +611,14 @@ public class SCANNER {
         } else return false;
     }
 
+    private boolean tryToGoToKeywordPossibleMatchStateAs(char expectedCharacter, TokenType keywordTokenTypeOnMatch) throws IOException {
+        if (tryToGoToKeywordStateWith(expectedCharacter, TokenizerPDAState.KEYWORD_POSSIBLE_MATCH)) {
+            probableTypeOfToken = keywordTokenTypeOnMatch;
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Tries to read a digit to append to the current token as a constant, and proceed to the given state if successful.
      * Proceeds to ERR_CONST on encountering anything else.
@@ -561,11 +629,13 @@ public class SCANNER {
     private void tryToAdvanceConstToState(TokenizerPDAState nextStateOnMatch) throws IOException {
         if (isAtEOF() || isSpecialCharacter(peek) || Character.isWhitespace(peek) || peek == '#') {
             currentState = TokenizerPDAState.ERR_CONST;
+            probableTypeOfToken = TokenType.MALFORMED_TOKEN;
         } else if (Character.isDigit(peek)) {
             appendPeekToCurrentToken();
             currentState = nextStateOnMatch;
         } else {
             appendPeekToCurrentToken();
+            probableTypeOfToken = TokenType.MALFORMED_TOKEN;
             currentState = TokenizerPDAState.ERR_CONST;
         }
     }
@@ -593,17 +663,21 @@ public class SCANNER {
      * E.g., in state "M A K", reading an "E" would confirm "make", but reading
      * anything else would suggest an ID or something - that's when this is called.
      *
+     * @return boolean whether or not the resulting token, including the peek character, was well-formed.
      * @throws IOException if an IOException is encountered while reading the next character
      */
-    private void handleKeywordMismatch() throws IOException {
+    private boolean handleKeywordMismatch() throws IOException {
         if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek) || peek == '#') {
             currentState = TokenizerPDAState.EMIT_ID;
+            return true;
         } else if (Character.isLetterOrDigit(peek)) {
             appendPeekToCurrentToken();
             currentState = TokenizerPDAState.ID;
+            return true;
         } else {
             appendPeekToCurrentToken();
             currentState = TokenizerPDAState.ERR_ID;
+            return false;
         }
     }
 
@@ -644,9 +718,9 @@ public class SCANNER {
 
     /**
      * Consumes characters until the 'peek' character is not a whitespace character
-     * @see Character#isWhitespace(char)
      *
      * @throws IOException if there is a problem reading from the characterSource
+     * @see Character#isWhitespace(char)
      */
     private void skipOverWhitespace() throws IOException {
         while (!isAtEOF() && Character.isWhitespace(peek))
@@ -666,8 +740,9 @@ public class SCANNER {
 
     /**
      * If peek is the start of a comment, consumes input until the next line.
-     * @see #skipUntilNewline()
+     *
      * @throws IOException if there is a problem reading from the characterSource
+     * @see #skipUntilNewline()
      */
     private void skipOverComments() throws IOException {
         while (!isAtEOF() && peek == '#')
@@ -677,10 +752,10 @@ public class SCANNER {
     /**
      * Skips over any whitespace or comments, until either the start of a token
      * is found or the end of the file is reached.
-     * @see #skipOverComments()
-     * @see #skipOverWhitespace()
      *
      * @throws IOException if there is a problem reading from the character source
+     * @see #skipOverComments()
+     * @see #skipOverWhitespace()
      */
     private void skipOverCommentsAndWhitespace() throws IOException {
         while (!isAtEOF() && (Character.isWhitespace(peek) || peek == '#')) {
@@ -691,7 +766,7 @@ public class SCANNER {
 
     /**
      * Represents all possible states for this {@link SCANNER} while tokenizing/scanning from the characterSource.
-     *
+     * <p>
      * Note that there is not a unique state for each fully-read keyword:
      * the behavior of the DFA after any keyword has been fully read is exactly the same for each,
      * so they were combined into a single state, {@link #KEYWORD_POSSIBLE_MATCH}.
@@ -746,6 +821,7 @@ public class SCANNER {
 
     /**
      * An exception thrown by {@link #getNextToken()} if there is no more input with which to produce a token
+     *
      * @see #getNextToken()
      * @see #hasMoreTokens()
      */

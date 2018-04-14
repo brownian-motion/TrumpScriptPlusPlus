@@ -10,7 +10,7 @@ public class ErrorToken extends Token{
      * @param erroneousText the unrecognizable source code text
      */
     public ErrorToken(String erroneousText){
-        super(erroneousText, false);
+        super(erroneousText, TokenType.MALFORMED_TOKEN);
     }
 
     /**
