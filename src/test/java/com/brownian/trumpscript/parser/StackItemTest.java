@@ -85,7 +85,6 @@ public class StackItemTest {
     @Test
     void test_terminalItemsWithSameChildrenAreEqual() {
         StackItemType[] stackItemTypes = StackItemType.values();
-        TokenType[] tokenTypes = TokenType.values();
         for (int i = 1; i < stackItemTypes.length && stackItemTypes[i].isTerminal(); i++) {
             LLStackItem left = new LLStackItem(stackItemTypes[i]),
                     right = new LLStackItem(stackItemTypes[i]);
@@ -98,7 +97,6 @@ public class StackItemTest {
     @Test
     void test_terminalItemsWithDifferentChildrenAreNotEqual() {
         StackItemType[] stackItemTypes = StackItemType.values();
-        TokenType[] tokenTypes = TokenType.values();
         for (int i = 1; i < stackItemTypes.length && stackItemTypes[i].isTerminal(); i++) {
             LLStackItem left = new LLStackItem(stackItemTypes[i]),
                     right = new LLStackItem(stackItemTypes[i]);
