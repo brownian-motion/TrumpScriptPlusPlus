@@ -137,7 +137,7 @@ public class TrumpscriptLL1ParseTable {
     }
 
 
-    public static StackItemType[] deriveChildren(StackItemType handle, TokenType lookahead) {
+    public static StackItemType[] lookupProductionFor(StackItemType handle, TokenType lookahead) {
         HandleLookaheadPair key = new HandleLookaheadPair(handle, lookahead);
         if (!handleLookaheadPairMap.containsKey(key))
             throw new InvalidLookaheadException(handle, lookahead);
@@ -188,7 +188,7 @@ public class TrumpscriptLL1ParseTable {
      * Thrown when trying to look up a production rule
      * for a handle+lookahead pair that is unknown, and therefore invalid.
      *
-     * @see #deriveChildren(StackItemType, TokenType)
+     * @see #lookupProductionFor(StackItemType, TokenType)
      */
     public static class InvalidLookaheadException extends IllegalArgumentException {
         private final StackItemType handle;
