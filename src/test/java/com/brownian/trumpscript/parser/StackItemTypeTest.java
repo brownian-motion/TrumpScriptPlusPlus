@@ -1,5 +1,6 @@
 package com.brownian.trumpscript.parser;
 
+import com.brownian.trumpscript.tokenizer.token.TokenType;
 import org.junit.jupiter.api.Test;
 
 import static com.brownian.trumpscript.parser.StackItemType.*;
@@ -233,6 +234,17 @@ class StackItemTypeTest {
             assertFalse(type.isNonterminal());
         }
     }
+
+    @Test
+    void test_allTerminalTypeNamesMatchTokenTypeWithSameOrdinalValue() {
+        final TokenType[] tokenTypes = TokenType.values();
+        final StackItemType[] stackItemTypes = StackItemType.values();
+        for (int i = 1 /* skip malformed token and stack bottom */; i < tokenTypes.length; i++) {
+            assertEquals(tokenTypes[i].name(), stackItemTypes[i].name());
+            assertEquals(stackItemTypes[i].ordinal(), tokenTypes[i].ordinal());
+        }
+    }
+
 
     @Test
     void test_allNonTerminalsAreNonTerminals() {
