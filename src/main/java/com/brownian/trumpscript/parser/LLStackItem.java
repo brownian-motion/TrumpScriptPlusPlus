@@ -67,6 +67,8 @@ public class LLStackItem {
     public boolean equals(Object other) {
         if (!(other instanceof LLStackItem)) return false;
         LLStackItem otherItem = (LLStackItem) other;
-        return this.getType() == otherItem.getType() && this.getChildren().equals(otherItem.getChildren()) && this.getToken().equals(otherItem.getToken());
+        return this.getType() == otherItem.getType()
+                && Arrays.equals(this.children, otherItem.children)
+                && this.getToken().equals(otherItem.getToken());
     }
 }
