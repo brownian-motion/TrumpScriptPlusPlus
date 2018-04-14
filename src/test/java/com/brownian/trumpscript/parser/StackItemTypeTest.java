@@ -245,6 +245,15 @@ class StackItemTypeTest {
         }
     }
 
+    @Test
+    void test_allTerminalStackItemsMatchAllTerminalTokens() {
+        final TokenType[] tokenTypes = TokenType.values();
+        final StackItemType[] stackItemTypes = StackItemType.values();
+        for (int i = 1 /* skip malformed token and stack bottom */; i < tokenTypes.length; i++) {
+            assertTrue(stackItemTypes[i].matches(tokenTypes[i]));
+        }
+    }
+
 
     @Test
     void test_allNonTerminalsAreNonTerminals() {

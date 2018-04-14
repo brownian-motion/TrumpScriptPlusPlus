@@ -1,5 +1,7 @@
 package com.brownian.trumpscript.parser;
 
+import com.brownian.trumpscript.tokenizer.token.TokenType;
+
 /**
  * Uniquely and exhaustively identifies
  * the type of an item on the parser stack.
@@ -123,5 +125,9 @@ public enum StackItemType {
             return String.format("[%s]", this.name().toLowerCase());
         }
         throw new IllegalStateException("Calling toString() of unexpected, unknown stack item type "+this.name());
+    }
+
+    public boolean matches(TokenType tokenType) {
+        return this.isTerminal() && this.ordinal() == tokenType.ordinal();
     }
 }

@@ -56,9 +56,17 @@ public class LLStackItem {
         return this.type;
     }
 
+    @Override
     public String toString() {
         return (this.children == null ?
                 this.token == null ? String.format("%s", this.type) : String.format("%s: \"%s\"", this.type, this.token)
                 : String.format("%10s children: %s", this.type, Arrays.toString(children)));
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof LLStackItem)) return false;
+        LLStackItem otherItem = (LLStackItem) other;
+        return this.getType() == otherItem.getType() && this.getChildren().equals(otherItem.getChildren()) && this.getToken().equals(otherItem.getToken());
     }
 }
