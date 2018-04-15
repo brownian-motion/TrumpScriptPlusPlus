@@ -355,7 +355,7 @@ public class SCANNER {
                     }
                     break;
                 case STRING_LITERAL_COMPLETE:
-                    if (isAtEOF() || Character.isWhitespace(peek) || peek == '#') {
+                    if (isAtEOF() || Character.isWhitespace(peek) || isSpecialCharacter(peek) || peek == '#') {
                         currentState = TokenizerPDAState.EMIT_STRING_LITERAL;
                     } else {
                         appendPeekToCurrentToken();
