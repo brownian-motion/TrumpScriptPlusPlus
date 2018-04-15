@@ -38,14 +38,14 @@ public class StepPrintingPARSER extends PARSER {
     private String formatProduction(LLStackItem top, StackItemType[] production) {
         String[] formattedTypes = new String[production.length];
         for (int i = 0; i < production.length; i++) {
-            formattedTypes[i] = formatStackItemType(production[i]);
+            formattedTypes[i] = production[i].toString();
         }
         return String.format("Use rule %s → %s", formatStackItem(top), String.join(" ", formattedTypes));
     }
 
 
     private void printAction(LLStackItem stackTop, Token lookahead, String action) {
-        out.printf("%5d %18s %18s %s", this.stepNumber, formatStackItem(stackTop), formatToken(lookahead), action);
+        out.printf("%5d %18s %18s %s\n", this.stepNumber, formatStackItem(stackTop), formatToken(lookahead), action);
         this.stepNumber++;
     }
 
@@ -54,18 +54,18 @@ public class StepPrintingPARSER extends PARSER {
     }
 
     private String formatStackItemType(StackItemType type) {
-        return type.toString() + " (" + type.ordinal() + ")";
+        return String.format("%s (%2d)", type.toString(), type.ordinal());
     }
 
     private String formatToken(Token token) {
         if (token == null)
             return "   -   ";
-        return token.toString() + " (" + token.getType().ordinal() + ")";
+        return String.format("%s (%2d)", token.getLexeme(), token.getType().ordinal());
     }
 
     private void printHeader() {
-        out.printf("%5s %18s %18s %s", "Steps", "Stack top", "LOKAHEAD₁", "ACTION");
+        out.printf("%5s %18s %18s %18s\n", "Steps", "Stack top", "LOOKAHEAD₁", "ACTION");
         final String eighteen = "------------------";
-        out.printf("%5s %18s %18s %s", "-----", eighteen, eighteen, eighteen);
+        out.printf("%5s %18s %18s %18s\n", "-----", eighteen, eighteen, eighteen);
     }
 }
