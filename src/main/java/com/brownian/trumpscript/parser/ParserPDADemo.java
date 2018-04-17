@@ -87,6 +87,7 @@ public class ParserPDADemo {
         System.err.println("Usage: java " + ParserPDADemo.class.getSimpleName() + " [<input file>]");
         System.err.println("\tParses the TrumpScript++ program specified by the argument, or via stdin.");
         System.err.println("\tPrints the result of parsing, and any parse errors.");
+        System.err.println("\tRun \"java " + ParserPDADemo.class.getSimpleName() + " --sample\" for an example run.");
         System.exit(1);
     }
 }
