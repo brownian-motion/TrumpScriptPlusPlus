@@ -21,7 +21,7 @@ JAR_PATH="out/artifacts/TrumpScriptPlusPlus_jar/TrumpScriptPlusPlus.jar"
 # see https://stackoverflow.com/questions/13515893/set-margin-size-when-converting-from-markdown-to-pdf-with-pandoc
 cat << "EOF"
 ---
-title: TrumpScript++ Tokenizer
+title: TrumpScript++ Parser 
 author: JJ Brown (113223831)
 date: \today
 geometry: margin=2cm
@@ -32,13 +32,7 @@ EOF
 echo "My submission is as follows:"
 echo "";
 
-echo "## Input File";
-echo "";
-for filename in $TRUMPSCRIPT_FILES ; do
-	printFileInfo "$filename";
-done
-
-echo "## Output";
+echo "## Output"; # includes .trump script input file
 markdownEscapeForCode
 java -jar "$JAR_PATH";
 markdownEscapeForCode
