@@ -34,7 +34,7 @@ echo "";
 
 echo "## Output"; # includes .trump script input file
 markdownEscapeForCode
-java -jar "$JAR_PATH";
+java "-Dfile.encoding=UTF-8" -jar "$JAR_PATH" --sample;
 markdownEscapeForCode
 
 echo " \\pagebreak ";
